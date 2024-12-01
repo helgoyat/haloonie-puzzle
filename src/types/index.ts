@@ -1,9 +1,12 @@
-export interface IBlock {
+export interface IBlock extends IPosition {
+  backgroundColor: string;
+  outlineColor: string;
+}
+
+export interface IPosition {
   base: Array<BaseEnum>;
   x: number;
   y: number;
-  backgroundColor: string;
-  outlineColor: string;
 }
 
 export enum BaseEnum {
