@@ -15,11 +15,14 @@ export const useMaze = () => {
   const orderedSolutions = computed(
     (): Array<{ maze: TMaze; steps: number }> =>
       solutions.value
-        .map((i, index) => ({ maze: i.filter((e) => e === BlockTypeEnum.Path), index }))
+        .map((i, index) => ({
+          maze: i.filter((e) => e === BlockTypeEnum.Path),
+          index,
+        }))
         .sort((a, b) => {
           return a.maze.length - b.maze.length;
         })
-        .map((i) => ({ maze: solutions.value[i.index], steps: i.maze.length }))
+        .map((i) => ({ maze: solutions.value[i.index], steps: i.maze.length })),
   );
 
   const reset = () => {
@@ -42,7 +45,10 @@ export const useMaze = () => {
           return BlockTypeEnum.End;
         } else {
           const randomInt = Math.floor(Math.random() * 2);
-          const key = Object.keys(BlockTypeEnum)[Object.values(BlockTypeEnum).indexOf(randomInt)];
+          const key =
+            Object.keys(BlockTypeEnum)[
+              Object.values(BlockTypeEnum).indexOf(randomInt)
+            ];
           if (key) {
             return BlockTypeEnum[key as keyof typeof BlockTypeEnum];
           } else {
@@ -68,12 +74,16 @@ export const useMaze = () => {
   const moveCursor = (maze: TMaze, solutions: TMaze[]): void => {
     const size = Math.sqrt(maze.length);
     if (!Number.isInteger(size)) {
-      throw new Error("An issue happened in 'moveCursor' function: incorrect maze size.");
+      throw new Error(
+        "An issue happened in 'moveCursor' function: incorrect maze size.",
+      );
     }
 
     const cursorIndex = maze.findIndex((i) => i === BlockTypeEnum.Cursor);
     if (cursorIndex < 0) {
-      throw new Error("An issue happened in 'moveCursor' function: cursor not found.");
+      throw new Error(
+        "An issue happened in 'moveCursor' function: cursor not found.",
+      );
     }
 
     function resolve(index: number) {
