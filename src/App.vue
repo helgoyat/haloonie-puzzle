@@ -41,7 +41,7 @@ function solve() {
 
 function nextSolution() {
   selectedSolution.value = selectedSolution.value + 1;
-  if (selectedSolution.value === solutions.value.length - 1) {
+  if (selectedSolution.value === solutions.value.length) {
     selectedSolution.value = 0;
   }
 }

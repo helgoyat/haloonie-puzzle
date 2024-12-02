@@ -69,16 +69,18 @@ export function solvePuzzle(
 
     for (const position in positionList) {
       const res = fitBlockPosition(positionList[position], { ...canva });
-      results.push(res);
+      if (res) {
+        results.push(res);
+      }
     }
 
-    break; // force stop to first block
+    break;
   }
 
   return results;
 }
 
-function fitBlockPosition(position: IPosition, canva: ICanva): number[] {
+function fitBlockPosition(position: IPosition, canva: ICanva): number[] | null {
   function getLine(index: number): number {
     return Math.floor((index + 1) / canva.x) + 1;
   }
@@ -91,15 +93,30 @@ function fitBlockPosition(position: IPosition, canva: ICanva): number[] {
   const fitInX = entryLine === getLine(entryIndex + position.x - 1);
   const fitInY = entryLine + position.y <= canva.y;
 
+  let overlap = false;
+
   if (fitInX && fitInY) {
     for (let y = 0; y < position.y; y++) {
+      if (overlap) break;
+
       for (let x = 0; x < position.x; x++) {
         const canvaIndex = entryIndex + x + y * canva.x;
         const positionIndex = x + y * position.x;
-        result[canvaIndex] = position.base[positionIndex];
+
+        if (result[canvaIndex] === 0) {
+          result[canvaIndex] = position.base[positionIndex];
+        } else if (result[canvaIndex] !== 0 && position.base[positionIndex] !== 0) {
+          overlap = true;
+          break;
+        }
       }
     }
   }
 
-  return result;
+  if (overlap) return null;
+
+  const firstSpotIndex = result.findIndex(e => e === 0);
+  const isValid = firstSpotIndex > entryIndex;
+
+  return isValid ? result : null;
 }
