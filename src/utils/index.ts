@@ -50,3 +50,13 @@ export function verticalAxialSymmetry(data: IPosition): IPosition {
 
   return { base, x: data.x, y: data.y };
 }
+
+export function solvePuzzle(
+  length: number,
+  height: number,
+  blockList: Record<number, IPosition[]>,
+): void {
+  const canva = new Array(length * height).fill(0);
+
+  console.log(blockList);
+}

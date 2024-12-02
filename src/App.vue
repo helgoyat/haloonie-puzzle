@@ -2,11 +2,11 @@
 import { ref } from "vue";
 import { type IBlock, type IPosition, BaseEnum } from "@/types";
 import { DataBlockList } from "@/data";
-import { getBlockPositionList } from "@/utils";
+import { getBlockPositionList, solvePuzzle } from "@/utils";
 import CanvaSpot from "@/components/CanvaSpot.vue";
 
 const length = ref<number>(11);
-const width = ref<number>(5);
+const height = ref<number>(5);
 const blockList = ref<IBlock[]>([...DataBlockList]);
 const selectedBlock = ref<number | null>(null);
 const blockPositionList = ref<IPosition[]>([]);
@@ -24,19 +24,29 @@ function handleSelectBlock(index: number) {
   const result = getBlockPositionList(block);
   blockPositionList.value = [...result];
 }
+
+function solve() {
+  const _blockList: Record<number, IPosition[]> = {};
+  blockList.value.forEach((b, i) => {
+    _blockList[i + 1] = getBlockPositionList(b);
+  });
+
+  solvePuzzle(length.value, height.value, _blockList);
+}
 </script>
 
 <template>
   <main class="flex flex-col justify-center items-center gap-4">
-    <div class="flex flex-col justify-center items-center h-screen">
+    <div class="flex flex-col justify-center items-center h-screen gap-6">
       <div
         class="p-4 outline-dashed outline-4 outline-gray-900 rounded bg-gray-700 grid gap-2"
         :style="`grid-template-columns: repeat(${length}, minmax(0, 1fr))`"
       >
-        <template v-for="(block, index) in length * width">
+        <template v-for="(block, index) in length * height">
           <component :is="CanvaSpot"></component>
         </template>
       </div>
+      <button @click="solve">Solve</button>
     </div>
     <div class="w-full bg-gray-700 p-12 text-white flex flex-col gap-8">
       <div class="text-xl">Puzzle Blocks</div>
