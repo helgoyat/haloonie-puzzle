@@ -1,4 +1,4 @@
-import type { IBlock, IPosition, BaseEnum } from "@/types";
+import type { ICanva, IBlock, IPosition, BaseEnum } from "@/types";
 
 export function getBlockPositionList(block: IBlock): IPosition[] {
   const initialBlock = { base: block.base, x: block.x, y: block.y };
@@ -56,7 +56,35 @@ export function solvePuzzle(
   height: number,
   blockList: Record<number, IPosition[]>,
 ): void {
-  const canva = new Array(length * height).fill(0);
+  const canva: ICanva = {
+    canva: new Array(length * height).fill(0),
+    x: length,
+    y: height,
+  };
 
-  console.log(blockList);
+  for (const block in blockList) {
+    const positionList = blockList[block];
+
+    for (const position in positionList) {
+      fitBlockPosition(positionList[position], { ...canva });
+    }
+
+    break; // force stop to first block
+  }
+}
+
+function fitBlockPosition(position: IPosition, canva: ICanva) {
+  function getLine(index: number): number {
+    return Math.floor((index + 1) / canva.x) + 1;
+  }
+
+  const entryIndex = canva.canva.findIndex((e) => e === 0);
+  const entryLine = getLine(entryIndex);
+
+  const fitInX = entryLine === getLine(entryIndex + position.x - 1);
+  const fitInY = entryLine + position.y <= canva.y;
+
+  if (fitInX && fitInY) {
+    console.log("Fit");
+  }
 }

@@ -1,3 +1,9 @@
+export interface ICanva {
+  canva: Array<number>;
+  x: number;
+  y: number;
+}
+
 export interface IBlock extends IPosition {
   backgroundColor: string;
   outlineColor: string;
