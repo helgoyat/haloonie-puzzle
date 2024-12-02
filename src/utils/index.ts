@@ -5,12 +5,14 @@ export function getBlockPositionList(block: IBlock): IPosition[] {
 
   const result = [initialBlock];
 
+  // 3 Rotations
   for (let i = 1; i < 4; i++) {
     const fromPosition = result[result.length - 1];
     const position = rotate90(fromPosition);
     result.push(position);
   }
 
+  // Vertical Symmetry and 3 Rotations
   const symmetricalPosition = verticalAxialSymmetry(initialBlock);
   result.push(symmetricalPosition);
 

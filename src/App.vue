@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { IBlock, IPositions, BaseEnum } from "@/types";
+import { type IBlock, type IPosition, BaseEnum } from "@/types";
 import { DataBlockList } from "@/data";
 import { getBlockPositionList } from "@/utils";
 import CanvaSpot from "@/components/CanvaSpot.vue";
@@ -9,7 +9,7 @@ const length = ref<number>(11);
 const width = ref<number>(5);
 const blockList = ref<IBlock[]>([...DataBlockList]);
 const selectedBlock = ref<number | null>(null);
-const blockPositionList = ref<IPositions[]>([]);
+const blockPositionList = ref<IPosition[]>([]);
 
 function handleSelectBlock(index: number) {
   const block = blockList.value[index];
@@ -68,11 +68,11 @@ function handleSelectBlock(index: number) {
         <div class="text-xl">Positions</div>
         <div class="flex flex-row items-start flex-wrap gap-6">
           <div
-            v-for="(block, index) in blockPositionList"
+            v-for="block in blockPositionList"
             class="p-3 grid gap-2 w-fit"
             :style="`grid-template-columns: repeat(${block.x}, minmax(0, 1fr))`"
           >
-            <template v-for="(el, index) in block.base">
+            <template v-for="el in block.base">
               <div
                 v-if="el === BaseEnum.ENTITY"
                 class="w-8 h-8 outline outline-2 rounded-sm bg-gray-800 outline-gray-900"
