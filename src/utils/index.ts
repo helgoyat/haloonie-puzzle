@@ -105,7 +105,10 @@ function fitBlockPosition(position: IPosition, canva: ICanva): number[] | null {
 
         if (result[canvaIndex] === 0) {
           result[canvaIndex] = position.base[positionIndex];
-        } else if (result[canvaIndex] !== 0 && position.base[positionIndex] !== 0) {
+        } else if (
+          result[canvaIndex] !== 0 &&
+          position.base[positionIndex] !== 0
+        ) {
           overlap = true;
           break;
         }
@@ -115,7 +118,7 @@ function fitBlockPosition(position: IPosition, canva: ICanva): number[] | null {
 
   if (overlap) return null;
 
-  const firstSpotIndex = result.findIndex(e => e === 0);
+  const firstSpotIndex = result.findIndex((e) => e === 0);
   const isValid = firstSpotIndex > entryIndex;
 
   return isValid ? result : null;
