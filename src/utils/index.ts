@@ -55,7 +55,9 @@ export function solvePuzzle(
   length: number,
   height: number,
   blockList: Record<number, IPosition[]>,
-): void {
+): Array<number[]> {
+  const results: Array<number[]> = [];
+
   const canva: ICanva = {
     canva: new Array(length * height).fill(0),
     x: length,
@@ -66,17 +68,22 @@ export function solvePuzzle(
     const positionList = blockList[block];
 
     for (const position in positionList) {
-      fitBlockPosition(positionList[position], { ...canva });
+      const res = fitBlockPosition(positionList[position], { ...canva });
+      results.push(res);
     }
 
     break; // force stop to first block
   }
+
+  return results;
 }
 
-function fitBlockPosition(position: IPosition, canva: ICanva) {
+function fitBlockPosition(position: IPosition, canva: ICanva): number[] {
   function getLine(index: number): number {
     return Math.floor((index + 1) / canva.x) + 1;
   }
+
+  const result = [...canva.canva];
 
   const entryIndex = canva.canva.findIndex((e) => e === 0);
   const entryLine = getLine(entryIndex);
@@ -85,6 +92,14 @@ function fitBlockPosition(position: IPosition, canva: ICanva) {
   const fitInY = entryLine + position.y <= canva.y;
 
   if (fitInX && fitInY) {
-    console.log("Fit");
+    for (let y = 0; y < position.y; y++) {
+      for (let x = 0; x < position.x; x++) {
+        const canvaIndex = entryIndex + x + y * canva.x;
+        const positionIndex = x + y * position.x;
+        result[canvaIndex] = position.base[positionIndex];
+      }
+    }
   }
+
+  return result;
 }
