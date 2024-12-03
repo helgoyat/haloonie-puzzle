@@ -135,14 +135,25 @@ function addBlock(
     (e) => e === BaseEnum.ENTITY,
   );
   let firstEntitySpotIndex: number | null = null;
+  let overlap = false;
 
   for (let y = 0; y < position.y; y++) {
+    if (overlap) break;
+
     for (let x = 0; x < position.x; x++) {
       const spotIndex = entryIndex + x + y * canva.x;
       const cursorIndex = x + y * position.x;
 
-      result[spotIndex] =
-        position.base[cursorIndex] === BaseEnum.ENTITY ? key : BaseEnum.NONE;
+      if (result[spotIndex] === BaseEnum.NONE) {
+        result[spotIndex] =
+          position.base[cursorIndex] === BaseEnum.ENTITY ? key : BaseEnum.NONE;
+      } else if (
+        result[spotIndex] !== BaseEnum.NONE &&
+        position.base[cursorIndex] !== BaseEnum.NONE
+      ) {
+        overlap = true;
+        break;
+      }
 
       if (cursorIndex === firstEntityIndex) {
         firstEntitySpotIndex = spotIndex;
@@ -150,36 +161,10 @@ function addBlock(
     }
   }
 
-  if (firstEntitySpotIndex === null) {
-    alert("Error: firstEntitySpotIndex");
-    return null;
-  }
-
+  if (overlap || firstEntitySpotIndex === null) return null;
   const isValid = !result
     .slice(0, firstEntitySpotIndex + 1)
     .some((e) => e === BaseEnum.NONE);
 
-  //   let overlap = false;
-
-  //   if (fitInX && fitInY) {
-  //     for (let y = 0; y < position.y; y++) {
-  //       if (overlap) break;
-
-  //       for (let x = 0; x < position.x; x++) {
-  //         const canvaIndex = entryIndex + x + y * canva.x;
-  //         const positionIndex = x + y * position.x;
-
-  //         if (result[canvaIndex] === 0) {
-  //           result[canvaIndex] = position.base[positionIndex];
-  //         } else if (
-  //           result[canvaIndex] !== 0 &&
-  //           position.base[positionIndex] !== 0
-  //         ) {
-  //           overlap = true;
-  //           break;
-  //         }
-  //       }
-  //     }
-  //   }
   return isValid ? result : null;
 }
