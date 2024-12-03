@@ -1,5 +1,5 @@
 export interface ICanva {
-  canva: Array<number>;
+  base: Array<number>;
   x: number;
   y: number;
 }

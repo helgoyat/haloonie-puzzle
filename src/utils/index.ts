@@ -19,7 +19,7 @@ export function getPositions(block: IBlock): IPosition[] {
     cursor = position;
   }
 
-  // Vertical Symmetry and 3 Rotations
+  // Vertical Symmetry
   const symmetricalPosition = verticalAxialSymmetry(initialBlock);
   const found = result.some((p) => isEqual(p, symmetricalPosition));
   if (!found) {
@@ -27,6 +27,7 @@ export function getPositions(block: IBlock): IPosition[] {
   }
   cursor = symmetricalPosition;
 
+  // 3 Rotations from Vertical Symmetry
   for (let i = 1; i < 4; i++) {
     const position = rotate90(cursor);
 
@@ -67,6 +68,10 @@ export function verticalAxialSymmetry(data: IPosition): IPosition {
   return { base, x: data.x, y: data.y };
 }
 
+function getLine(index: number, length: number): number {
+  return Math.floor((index + 1) / length) + 1;
+}
+
 export function solvePuzzle(
   length: number,
   height: number,
@@ -80,65 +85,67 @@ export function solvePuzzle(
   });
 
   const canva: ICanva = {
-    canva: new Array(length * height).fill(0),
+    base: new Array(length * height).fill(0),
     x: length,
     y: height,
   };
 
-  // for (const block in blockList) {
-  //   const positionList = blockList[block];
+  function addBlock(canva: ICanva, blocks: Record<number, IPosition[]>) {
+    const entryIndex = canva.base.findIndex((e) => e === 0);
+    const entryLine = getLine(entryIndex, canva.x);
 
-  //   for (const position in positionList) {
-  //     const res = fitBlockPosition(positionList[position], { ...canva });
-  //     if (res) {
-  //       results.push(res);
-  //     }
-  //   }
-  // }
+    for (const blockIndex in blocks) {
+      const positions = blocks[blockIndex];
 
-  return results;
-}
-
-function fitBlockPosition(position: IPosition, canva: ICanva): number[] | null {
-  function getLine(index: number): number {
-    return Math.floor((index + 1) / canva.x) + 1;
-  }
-
-  const result = [...canva.canva];
-
-  const entryIndex = canva.canva.findIndex((e) => e === 0);
-  const entryLine = getLine(entryIndex);
-
-  const fitInX = entryLine === getLine(entryIndex + position.x - 1);
-  const fitInY = entryLine + position.y <= canva.y;
-
-  let overlap = false;
-
-  if (fitInX && fitInY) {
-    for (let y = 0; y < position.y; y++) {
-      if (overlap) break;
-
-      for (let x = 0; x < position.x; x++) {
-        const canvaIndex = entryIndex + x + y * canva.x;
-        const positionIndex = x + y * position.x;
-
-        if (result[canvaIndex] === 0) {
-          result[canvaIndex] = position.base[positionIndex];
-        } else if (
-          result[canvaIndex] !== 0 &&
-          position.base[positionIndex] !== 0
-        ) {
-          overlap = true;
-          break;
-        }
+      for (const positionIndex in positions) {
+        const position = positions[positionIndex];
       }
     }
   }
 
-  if (overlap) return null;
-
-  const firstSpotIndex = result.findIndex((e) => e === 0);
-  const isValid = firstSpotIndex > entryIndex;
-
-  return isValid ? result : null;
+  return results;
 }
+
+// function fitBlockPosition(position: IPosition, canva: ICanva): number[] | null {
+//   function getLine(index: number): number {
+//     return Math.floor((index + 1) / canva.x) + 1;
+//   }
+
+//   const result = [...canva.canva];
+
+//   const entryIndex = canva.canva.findIndex((e) => e === 0);
+//   const entryLine = getLine(entryIndex);
+
+//   const fitInX = entryLine === getLine(entryIndex + position.x - 1);
+//   const fitInY = entryLine + position.y <= canva.y;
+
+//   let overlap = false;
+
+//   if (fitInX && fitInY) {
+//     for (let y = 0; y < position.y; y++) {
+//       if (overlap) break;
+
+//       for (let x = 0; x < position.x; x++) {
+//         const canvaIndex = entryIndex + x + y * canva.x;
+//         const positionIndex = x + y * position.x;
+
+//         if (result[canvaIndex] === 0) {
+//           result[canvaIndex] = position.base[positionIndex];
+//         } else if (
+//           result[canvaIndex] !== 0 &&
+//           position.base[positionIndex] !== 0
+//         ) {
+//           overlap = true;
+//           break;
+//         }
+//       }
+//     }
+//   }
+
+//   if (overlap) return null;
+
+//   const firstSpotIndex = result.findIndex((e) => e === 0);
+//   const isValid = firstSpotIndex > entryIndex;
+
+//   return isValid ? result : null;
+// }
