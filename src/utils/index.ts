@@ -1,25 +1,41 @@
+import { isEqual } from "lodash";
 import type { ICanva, IBlock, IPosition, BaseEnum } from "@/types";
 
-export function getBlockPositionList(block: IBlock): IPosition[] {
+export function getPositions(block: IBlock): IPosition[] {
   const initialBlock = { base: block.base, x: block.x, y: block.y };
 
-  const result = [initialBlock];
+  const result = [{ ...initialBlock }];
+  let cursor: IPosition = initialBlock;
 
   // 3 Rotations
   for (let i = 1; i < 4; i++) {
-    const fromPosition = result[result.length - 1];
-    const position = rotate90(fromPosition);
-    result.push(position);
+    const position = rotate90(cursor);
+
+    const found = result.some((p) => isEqual(p, position));
+    if (!found) {
+      result.push(position);
+    }
+
+    cursor = position;
   }
 
   // Vertical Symmetry and 3 Rotations
   const symmetricalPosition = verticalAxialSymmetry(initialBlock);
-  result.push(symmetricalPosition);
+  const found = result.some((p) => isEqual(p, symmetricalPosition));
+  if (!found) {
+    result.push(symmetricalPosition);
+  }
+  cursor = symmetricalPosition;
 
   for (let i = 1; i < 4; i++) {
-    const fromPosition = result[result.length - 1];
-    const position = rotate90(fromPosition);
-    result.push(position);
+    const position = rotate90(cursor);
+
+    const found = result.some((p) => isEqual(p, position));
+    if (!found) {
+      result.push(position);
+    }
+
+    cursor = position;
   }
 
   return result;
@@ -54,9 +70,14 @@ export function verticalAxialSymmetry(data: IPosition): IPosition {
 export function solvePuzzle(
   length: number,
   height: number,
-  blockList: Record<number, IPosition[]>,
+  blockList: Array<IBlock>,
 ): Array<number[]> {
   const results: Array<number[]> = [];
+
+  const blocks: Record<number, IPosition[]> = {};
+  blockList.forEach((b, i) => {
+    blocks[i + 1] = getPositions(b);
+  });
 
   const canva: ICanva = {
     canva: new Array(length * height).fill(0),
@@ -64,18 +85,16 @@ export function solvePuzzle(
     y: height,
   };
 
-  for (const block in blockList) {
-    const positionList = blockList[block];
+  // for (const block in blockList) {
+  //   const positionList = blockList[block];
 
-    for (const position in positionList) {
-      const res = fitBlockPosition(positionList[position], { ...canva });
-      if (res) {
-        results.push(res);
-      }
-    }
-
-    break;
-  }
+  //   for (const position in positionList) {
+  //     const res = fitBlockPosition(positionList[position], { ...canva });
+  //     if (res) {
+  //       results.push(res);
+  //     }
+  //   }
+  // }
 
   return results;
 }

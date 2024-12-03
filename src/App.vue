@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { type IBlock, type IPosition, BaseEnum } from "@/types";
 import { DataBlockList } from "@/data";
-import { getBlockPositionList, solvePuzzle } from "@/utils";
+import { getPositions, solvePuzzle } from "@/utils";
 import CanvaSpot from "@/components/CanvaSpot.vue";
 import CanvaBlock from "@/components/CanvaBlock.vue";
 
@@ -12,7 +12,7 @@ const blockList = ref<IBlock[]>([...DataBlockList]);
 const selectedBlock = ref<number | null>(null);
 const blockPositionList = ref<IPosition[]>([]);
 const solutions = ref<Array<number[]>>([]);
-const selectedSolution = ref<number>(0);
+const selectedSolutionIndex = ref<number>(0);
 
 function handleSelectBlock(index: number) {
   const block = blockList.value[index];
@@ -24,25 +24,22 @@ function handleSelectBlock(index: number) {
     return;
   }
   selectedBlock.value = index;
-  const result = getBlockPositionList(block);
+  const result = getPositions(block);
   blockPositionList.value = [...result];
 }
 
 function solve() {
-  selectedSolution.value = 0;
+  selectedSolutionIndex.value = 0;
 
-  const _blockList: Record<number, IPosition[]> = {};
-  blockList.value.forEach((b, i) => {
-    _blockList[i + 1] = getBlockPositionList(b);
-  });
+  const test = solvePuzzle(length.value, height.value, blockList.value);
 
-  solutions.value = solvePuzzle(length.value, height.value, _blockList);
+  console.log(test);
 }
 
 function nextSolution() {
-  selectedSolution.value = selectedSolution.value + 1;
-  if (selectedSolution.value === solutions.value.length) {
-    selectedSolution.value = 0;
+  selectedSolutionIndex.value = selectedSolutionIndex.value + 1;
+  if (selectedSolutionIndex.value === solutions.value.length) {
+    selectedSolutionIndex.value = 0;
   }
 }
 </script>
@@ -62,7 +59,7 @@ function nextSolution() {
         </template>
         <template v-else>
           <component
-            v-for="block in solutions[selectedSolution]"
+            v-for="block in solutions[selectedSolutionIndex]"
             :is="block === 0 ? CanvaSpot : CanvaBlock"
           ></component>
         </template>
