@@ -69,7 +69,7 @@ export function verticalAxialSymmetry(data: IPosition): IPosition {
 }
 
 function getLine(index: number, length: number): number {
-  return Math.floor((index + 1) / length) + 1;
+  return Math.floor(index / length) + 1;
 }
 
 export function solvePuzzle(
@@ -90,62 +90,85 @@ export function solvePuzzle(
     y: height,
   };
 
-  function addBlock(canva: ICanva, blocks: Record<number, IPosition[]>) {
-    const entryIndex = canva.base.findIndex((e) => e === 0);
-    const entryLine = getLine(entryIndex, canva.x);
+  // params: canva and blocks
+  function fit() {
+    for (const spotIndex in canva.base) {
+      const index = parseInt(spotIndex);
+      const line = getLine(index, canva.x);
 
-    for (const blockIndex in blocks) {
-      const positions = blocks[blockIndex];
+      for (const blockIndex in blocks) {
+        const positions = blocks[blockIndex];
 
-      for (const positionIndex in positions) {
-        const position = positions[positionIndex];
+        for (const positionIndex in positions) {
+          const position = positions[positionIndex];
+
+          const res = addBlock(canva, position, index, line);
+          if (res) results.push(res);
+
+          break;
+        }
+        break;
       }
     }
   }
 
+  fit();
+
   return results;
 }
 
-// function fitBlockPosition(position: IPosition, canva: ICanva): number[] | null {
-//   function getLine(index: number): number {
-//     return Math.floor((index + 1) / canva.x) + 1;
-//   }
+function addBlock(
+  canva: ICanva,
+  position: IPosition,
+  entryIndex: number,
+  entryLine: number,
+): number[] | null {
+  const result = [...canva.base];
 
-//   const result = [...canva.canva];
+  const fitInX = entryLine === getLine(entryIndex + position.x - 1, canva.x);
+  const fitInY = entryLine + position.y - 1 <= canva.y;
 
-//   const entryIndex = canva.canva.findIndex((e) => e === 0);
-//   const entryLine = getLine(entryIndex);
+  const fitInCanva = fitInX && fitInY;
 
-//   const fitInX = entryLine === getLine(entryIndex + position.x - 1);
-//   const fitInY = entryLine + position.y <= canva.y;
+  if (!fitInCanva) return null;
 
-//   let overlap = false;
+  for (let y = 0; y < position.y; y++) {
+    for (let x = 0; x < position.x; x++) {
+      const spotIndex = entryIndex + x + y * canva.x;
+      const value = x + y * position.x;
 
-//   if (fitInX && fitInY) {
-//     for (let y = 0; y < position.y; y++) {
-//       if (overlap) break;
+      result[spotIndex] = position.base[value];
+    }
+  }
 
-//       for (let x = 0; x < position.x; x++) {
-//         const canvaIndex = entryIndex + x + y * canva.x;
-//         const positionIndex = x + y * position.x;
+  //   let overlap = false;
 
-//         if (result[canvaIndex] === 0) {
-//           result[canvaIndex] = position.base[positionIndex];
-//         } else if (
-//           result[canvaIndex] !== 0 &&
-//           position.base[positionIndex] !== 0
-//         ) {
-//           overlap = true;
-//           break;
-//         }
-//       }
-//     }
-//   }
+  //   if (fitInX && fitInY) {
+  //     for (let y = 0; y < position.y; y++) {
+  //       if (overlap) break;
 
-//   if (overlap) return null;
+  //       for (let x = 0; x < position.x; x++) {
+  //         const canvaIndex = entryIndex + x + y * canva.x;
+  //         const positionIndex = x + y * position.x;
 
-//   const firstSpotIndex = result.findIndex((e) => e === 0);
-//   const isValid = firstSpotIndex > entryIndex;
+  //         if (result[canvaIndex] === 0) {
+  //           result[canvaIndex] = position.base[positionIndex];
+  //         } else if (
+  //           result[canvaIndex] !== 0 &&
+  //           position.base[positionIndex] !== 0
+  //         ) {
+  //           overlap = true;
+  //           break;
+  //         }
+  //       }
+  //     }
+  //   }
 
-//   return isValid ? result : null;
-// }
+  //   if (overlap) return null;
+
+  //   const firstSpotIndex = result.findIndex((e) => e === 0);
+  //   const isValid = firstSpotIndex > entryIndex;
+
+  //   return isValid ? result : null;
+  return result;
+}

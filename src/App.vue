@@ -33,7 +33,7 @@ function solve() {
 
   const test = solvePuzzle(length.value, height.value, blockList.value);
 
-  console.log(test);
+  solutions.value = test;
 }
 
 function nextSolution() {
@@ -59,8 +59,9 @@ function nextSolution() {
         </template>
         <template v-else>
           <component
-            v-for="block in solutions[selectedSolutionIndex]"
-            :is="block === 0 ? CanvaSpot : CanvaBlock"
+            v-for="value in solutions[selectedSolutionIndex]"
+            :is="value === 0 ? CanvaSpot : CanvaBlock"
+            :block="blockList[value - 1]"
           ></component>
         </template>
       </div>
