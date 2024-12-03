@@ -1,5 +1,5 @@
 import { isEqual } from "lodash";
-import type { ICanva, IBlock, IPosition, BaseEnum } from "@/types";
+import { type ICanva, type IBlock, type IPosition, BaseEnum } from "@/types";
 
 export function getPositions(block: IBlock): IPosition[] {
   const initialBlock = { base: block.base, x: block.x, y: block.y };
@@ -92,22 +92,20 @@ export function solvePuzzle(
 
   // params: canva and blocks
   function fit() {
-    for (const spotIndex in canva.base) {
-      const index = parseInt(spotIndex);
+    for (const spotKey in canva.base) {
+      const index = parseInt(spotKey);
       const line = getLine(index, canva.x);
 
-      for (const blockIndex in blocks) {
-        const positions = blocks[blockIndex];
+      for (const blockKey in blocks) {
+        const key = parseInt(blockKey);
+        const positions = blocks[blockKey];
 
-        for (const positionIndex in positions) {
-          const position = positions[positionIndex];
+        for (const positionKey in positions) {
+          const position = positions[positionKey];
 
-          const res = addBlock(canva, position, index, line);
+          const res = addBlock(canva, position, key, index, line);
           if (res) results.push(res);
-
-          break;
         }
-        break;
       }
     }
   }
@@ -120,6 +118,7 @@ export function solvePuzzle(
 function addBlock(
   canva: ICanva,
   position: IPosition,
+  key: number,
   entryIndex: number,
   entryLine: number,
 ): number[] | null {
@@ -132,14 +131,33 @@ function addBlock(
 
   if (!fitInCanva) return null;
 
+  const firstEntityIndex: number = position.base.findIndex(
+    (e) => e === BaseEnum.ENTITY,
+  );
+  let firstEntitySpotIndex: number | null = null;
+
   for (let y = 0; y < position.y; y++) {
     for (let x = 0; x < position.x; x++) {
       const spotIndex = entryIndex + x + y * canva.x;
-      const value = x + y * position.x;
+      const cursorIndex = x + y * position.x;
 
-      result[spotIndex] = position.base[value];
+      result[spotIndex] =
+        position.base[cursorIndex] === BaseEnum.ENTITY ? key : BaseEnum.NONE;
+
+      if (cursorIndex === firstEntityIndex) {
+        firstEntitySpotIndex = spotIndex;
+      }
     }
   }
+
+  if (firstEntitySpotIndex === null) {
+    alert("Error: firstEntitySpotIndex");
+    return null;
+  }
+
+  const isValid = !result
+    .slice(0, firstEntitySpotIndex + 1)
+    .some((e) => e === BaseEnum.NONE);
 
   //   let overlap = false;
 
@@ -163,12 +181,5 @@ function addBlock(
   //       }
   //     }
   //   }
-
-  //   if (overlap) return null;
-
-  //   const firstSpotIndex = result.findIndex((e) => e === 0);
-  //   const isValid = firstSpotIndex > entryIndex;
-
-  //   return isValid ? result : null;
-  return result;
+  return isValid ? result : null;
 }
