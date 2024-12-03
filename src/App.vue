@@ -13,6 +13,7 @@ const selectedBlock = ref<number | null>(null);
 const blockPositionList = ref<IPosition[]>([]);
 const solutions = ref<Array<number[]>>([]);
 const selectedSolutionIndex = ref<number>(0);
+const loading = ref<boolean>(false);
 
 function handleSelectBlock(index: number) {
   const block = blockList.value[index];
@@ -30,10 +31,12 @@ function handleSelectBlock(index: number) {
 
 function solve() {
   selectedSolutionIndex.value = 0;
+  loading.value = true;
 
   const test = solvePuzzle(length.value, height.value, blockList.value);
 
   solutions.value = test;
+  loading.value = false;
 }
 
 function nextSolution() {
@@ -48,6 +51,7 @@ function nextSolution() {
   <main class="flex flex-col justify-center items-center gap-4">
     <div class="flex flex-col justify-center items-center h-screen gap-6">
       <div
+        v-if="!loading"
         class="p-4 outline-dashed outline-4 outline-gray-900 rounded bg-gray-700 grid gap-2"
         :style="`grid-template-columns: repeat(${length}, minmax(0, 1fr))`"
       >

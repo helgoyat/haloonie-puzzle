@@ -79,20 +79,23 @@ export function solvePuzzle(
 ): Array<number[]> {
   const results: Array<number[]> = [];
 
-  const blocks: Record<number, IPosition[]> = {};
+  const _blocks: Record<number, IPosition[]> = {};
   blockList.forEach((b, i) => {
-    blocks[i + 1] = getPositions(b);
+    _blocks[i + 1] = getPositions(b);
   });
 
-  const canva: ICanva = {
+  const _canva: ICanva = {
     base: new Array(length * height).fill(0),
     x: length,
     y: height,
   };
 
-  // params: canva and blocks
-  function fit() {
+  function fit(canva: ICanva, blocks: Record<number, IPosition[]>) {
     for (const spotKey in canva.base) {
+      console.log(spotKey);
+
+      if (spotKey === "3") break;
+
       const index = parseInt(spotKey);
       const line = getLine(index, canva.x);
 
@@ -104,13 +107,23 @@ export function solvePuzzle(
           const position = positions[positionKey];
 
           const res = addBlock(canva, position, key, index, line);
-          if (res) results.push(res);
+          if (res) {
+            const updatedCanva = { base: res, x: canva.x, y: canva.y };
+            const updatedBlocks = { ...blocks };
+            delete updatedBlocks[key];
+
+            fit(updatedCanva, updatedBlocks);
+
+            if (Object.keys(updatedBlocks).length === 8) {
+              results.push(res);
+            }
+          }
         }
       }
     }
   }
 
-  fit();
+  fit(_canva, _blocks);
 
   return results;
 }
