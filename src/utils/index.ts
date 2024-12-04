@@ -84,11 +84,57 @@ export function solvePuzzle(
     _blocks[i + 1] = getPositions(b);
   });
 
+  // delete _blocks[2];
+  // delete _blocks[4];
+  // delete _blocks[11];
+  // delete _blocks[9];
+  // delete _blocks[12];
+  // delete _blocks[8];
+  // delete _blocks[7];
+
   const _canva: ICanva = {
     base: new Array(length * height).fill(0),
     x: length,
     y: height,
   };
+
+  // _canva.base[0] = 2;
+  // _canva.base[11] = 2;
+  // _canva.base[12] = 2;
+  // _canva.base[22] = 2;
+
+  // _canva.base[1] = 4;
+  // _canva.base[2] = 4;
+  // _canva.base[3] = 4;
+  // _canva.base[4] = 4;
+  // _canva.base[14] = 4;
+
+  // _canva.base[5] = 11;
+  // _canva.base[6] = 11;
+  // _canva.base[7] = 11;
+  // _canva.base[18] = 11;
+  // _canva.base[29] = 11;
+
+  // _canva.base[8] = 9;
+  // _canva.base[9] = 9;
+  // _canva.base[10] = 9;
+  // _canva.base[19] = 9;
+  // _canva.base[21] = 9;
+
+  // _canva.base[20] = 12;
+  // _canva.base[31] = 12;
+  // _canva.base[32] = 12;
+
+  // _canva.base[40] = 8;
+  // _canva.base[51] = 8;
+  // _canva.base[41] = 8;
+  // _canva.base[30] = 8;
+
+  // _canva.base[42] = 7;
+  // _canva.base[43] = 7;
+  // _canva.base[52] = 7;
+  // _canva.base[53] = 7;
+  // _canva.base[54] = 7;
 
   function fit(canva: ICanva, blocks: Record<number, IPosition[]>) {
     outer_loop: for (const spotKey in canva.base) {
@@ -114,7 +160,7 @@ export function solvePuzzle(
             }
 
             // Stop at 4 solutions
-            if (results.length < 4) {
+            if (results.length < 5) {
               fit(updatedCanva, updatedBlocks);
             }
           }
