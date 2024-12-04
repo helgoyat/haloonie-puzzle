@@ -108,7 +108,7 @@ export function solvePuzzle(
             const updatedBlocks = { ...blocks };
             delete updatedBlocks[key];
 
-            if (Object.keys(updatedBlocks).length === 0) {
+            if (!res.some((e) => e === BaseEnum.NONE)) {
               results.push(res);
               break outer_loop;
             }
