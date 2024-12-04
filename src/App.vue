@@ -6,7 +6,7 @@ import { getPositions, solvePuzzle } from "@/utils";
 import CanvaSpot from "@/components/CanvaSpot.vue";
 import CanvaBlock from "@/components/CanvaBlock.vue";
 
-const length = ref<number>(3);
+const length = ref<number>(5);
 const height = ref<number>(4);
 const blockList = ref<IBlock[]>([...DataBlockList]);
 const selectedBlock = ref<number | null>(null);
