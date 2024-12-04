@@ -9,10 +9,9 @@ defineProps({
 
 <template>
   <div
-    class="w-8 h-8 outline outline-2 rounded-sm"
+    class="w-10 h-10 rounded shadow-lg"
     :style="{
       backgroundColor: block.backgroundColor,
-      outlineColor: block.outlineColor,
     }"
   ></div>
 </template>

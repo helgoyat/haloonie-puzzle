@@ -65,7 +65,7 @@ function nextSolution() {
       </div>
       <div class="flex flex-row gap-2">
         <button class="w-28" @click="solve">Solve</button>
-        <button class="w-28" @click="nextSolution">Next</button>
+        <button v-if="solutions.length > 1" class="w-28" @click="nextSolution">Next</button>
       </div>
     </div>
     <div class="w-full bg-gray-700 p-12 text-white flex flex-col gap-8">
@@ -73,7 +73,7 @@ function nextSolution() {
       <div class="flex flex-row items-start flex-wrap gap-6">
         <div
           v-for="(block, index) in blockList"
-          class="p-3 grid gap-2 w-fit hover:cursor-pointer hover:outline outline-gray-600 outline-2 hover:bg-gray-800 rounded"
+          class="p-3 grid gap-2 w-fit hover:cursor-pointer hover:outline outline-gray-500 outline-2 hover:bg-gray-800 rounded"
           :class="selectedBlock === index && 'bg-gray-800'"
           :style="`grid-template-columns: repeat(${block.x}, minmax(0, 1fr))`"
           @click="handleSelectBlock(index)"
@@ -81,15 +81,14 @@ function nextSolution() {
           <template v-for="(el, index) in block.base">
             <div
               v-if="el === BaseEnum.ENTITY"
-              class="w-8 h-8 outline outline-2 rounded-sm"
+              class="w-10 h-10 rounded shadow-lg"
               :style="{
                 backgroundColor: block.backgroundColor,
-                outlineColor: block.outlineColor,
               }"
             ></div>
             <div
               v-if="el === BaseEnum.NONE"
-              class="bg-transparent w-8 h-8"
+              class="bg-transparent w-10 h-10"
             ></div>
           </template>
         </div>
@@ -105,11 +104,11 @@ function nextSolution() {
             <template v-for="el in block.base">
               <div
                 v-if="el === BaseEnum.ENTITY"
-                class="w-8 h-8 outline outline-2 rounded-sm bg-gray-800 outline-gray-900"
+                class="w-10 h-10 rounded bg-gray-800 shadow-lg"
               ></div>
               <div
                 v-if="el === BaseEnum.NONE"
-                class="bg-transparent w-8 h-8"
+                class="bg-transparent w-10 h-10"
               ></div>
             </template>
           </div>
