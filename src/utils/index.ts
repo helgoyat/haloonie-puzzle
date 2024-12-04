@@ -113,7 +113,10 @@ export function solvePuzzle(
               break outer_loop;
             }
 
-            fit(updatedCanva, updatedBlocks);
+            // Stop at 4 solutions
+            if (results.length < 4) {
+              fit(updatedCanva, updatedBlocks);
+            }
           }
         }
       }
