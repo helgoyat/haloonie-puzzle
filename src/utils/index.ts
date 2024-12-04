@@ -91,11 +91,7 @@ export function solvePuzzle(
   };
 
   function fit(canva: ICanva, blocks: Record<number, IPosition[]>) {
-    for (const spotKey in canva.base) {
-      console.log(spotKey);
-
-      if (spotKey === "3") break;
-
+    outer_loop: for (const spotKey in canva.base) {
       const index = parseInt(spotKey);
       const line = getLine(index, canva.x);
 
@@ -112,11 +108,12 @@ export function solvePuzzle(
             const updatedBlocks = { ...blocks };
             delete updatedBlocks[key];
 
-            fit(updatedCanva, updatedBlocks);
-
-            if (Object.keys(updatedBlocks).length === 8) {
+            if (Object.keys(updatedBlocks).length === 0) {
               results.push(res);
+              break outer_loop;
             }
+
+            fit(updatedCanva, updatedBlocks);
           }
         }
       }

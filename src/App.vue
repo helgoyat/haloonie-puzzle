@@ -6,8 +6,8 @@ import { getPositions, solvePuzzle } from "@/utils";
 import CanvaSpot from "@/components/CanvaSpot.vue";
 import CanvaBlock from "@/components/CanvaBlock.vue";
 
-const length = ref<number>(11);
-const height = ref<number>(5);
+const length = ref<number>(3);
+const height = ref<number>(4);
 const blockList = ref<IBlock[]>([...DataBlockList]);
 const selectedBlock = ref<number | null>(null);
 const blockPositionList = ref<IPosition[]>([]);
@@ -33,9 +33,9 @@ function solve() {
   selectedSolutionIndex.value = 0;
   loading.value = true;
 
-  const test = solvePuzzle(length.value, height.value, blockList.value);
+  const result = solvePuzzle(length.value, height.value, blockList.value);
+  solutions.value = result;
 
-  solutions.value = test;
   loading.value = false;
 }
 
