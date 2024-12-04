@@ -65,7 +65,9 @@ function nextSolution() {
       </div>
       <div class="flex flex-row gap-2">
         <button class="w-28" @click="solve">Solve</button>
-        <button v-if="solutions.length > 1" class="w-28" @click="nextSolution">Next</button>
+        <button v-if="solutions.length > 1" class="w-28" @click="nextSolution">
+          Next
+        </button>
       </div>
     </div>
     <div class="w-full bg-gray-700 p-12 text-white flex flex-col gap-8">
