@@ -70,6 +70,7 @@ function nextSolution() {
         </button>
       </div>
     </div>
+    <!-- Puzzle Blocks -->
     <div class="w-full bg-gray-700 p-12 text-white flex flex-col gap-8">
       <div class="text-xl">Puzzle Blocks</div>
       <div class="flex flex-row items-start flex-wrap gap-6">
@@ -80,21 +81,21 @@ function nextSolution() {
           :style="`grid-template-columns: repeat(${block.x}, minmax(0, 1fr))`"
           @click="handleSelectBlock(index)"
         >
-          <template v-for="(el, index) in block.base">
+          <template v-for="el in block.base">
             <div
-              v-if="el === BaseEnum.ENTITY"
-              class="w-10 h-10 rounded shadow-lg"
+              class="w-10 h-10"
+              :class="el === BaseEnum.ENTITY && 'rounded shadow-lg'"
               :style="{
-                backgroundColor: block.backgroundColor,
+                backgroundColor:
+                  el === BaseEnum.ENTITY
+                    ? block.backgroundColor
+                    : 'transparent',
               }"
-            ></div>
-            <div
-              v-if="el === BaseEnum.NONE"
-              class="bg-transparent w-10 h-10"
             ></div>
           </template>
         </div>
       </div>
+      <!-- Positions -->
       <template v-if="selectedBlock !== null && blockPositionList.length">
         <div class="text-xl">Positions</div>
         <div class="flex flex-row items-start flex-wrap gap-6">
@@ -105,12 +106,12 @@ function nextSolution() {
           >
             <template v-for="el in block.base">
               <div
-                v-if="el === BaseEnum.ENTITY"
-                class="w-10 h-10 rounded bg-gray-800 shadow-lg"
-              ></div>
-              <div
-                v-if="el === BaseEnum.NONE"
-                class="bg-transparent w-10 h-10"
+                class="w-10 h-10"
+                :class="
+                  el === BaseEnum.ENTITY
+                    ? 'rounded bg-gray-800 shadow-lg'
+                    : 'bg-transparent'
+                "
               ></div>
             </template>
           </div>
