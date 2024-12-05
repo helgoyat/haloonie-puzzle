@@ -3,6 +3,7 @@ import { EmitFlags } from "typescript";
 
 export const DataBlockList: IBlock[] = [
   {
+    id: 1,
     base: [
       BaseEnum.NONE,
       BaseEnum.ENTITY,
@@ -17,9 +18,9 @@ export const DataBlockList: IBlock[] = [
     x: 3,
     y: 3,
     backgroundColor: "rgb(249 115 22)",
-    outlineColor: "rgb(251 146 60)",
   },
   {
+    id: 2,
     base: [
       BaseEnum.ENTITY,
       BaseEnum.NONE,
@@ -31,9 +32,9 @@ export const DataBlockList: IBlock[] = [
     x: 2,
     y: 3,
     backgroundColor: "rgb(22 163 74)",
-    outlineColor: "rgb(34 197 94)",
   },
   {
+    id: 3,
     base: [
       BaseEnum.ENTITY,
       BaseEnum.NONE,
@@ -47,9 +48,9 @@ export const DataBlockList: IBlock[] = [
     x: 2,
     y: 4,
     backgroundColor: "rgb(220 38 38)",
-    outlineColor: "rgb(248 113 113)",
   },
   {
+    id: 4,
     base: [
       BaseEnum.ENTITY,
       BaseEnum.NONE,
@@ -63,9 +64,9 @@ export const DataBlockList: IBlock[] = [
     x: 2,
     y: 4,
     backgroundColor: "rgb(234 179 8)",
-    outlineColor: "rgb(250 204 21)",
   },
   {
+    id: 5,
     base: [
       BaseEnum.NONE,
       BaseEnum.ENTITY,
@@ -79,9 +80,9 @@ export const DataBlockList: IBlock[] = [
     x: 2,
     y: 4,
     backgroundColor: "rgb(236 72 153)",
-    outlineColor: "rgb(244 114 182)",
   },
   {
+    id: 6,
     base: [
       BaseEnum.NONE,
       BaseEnum.ENTITY,
@@ -96,9 +97,9 @@ export const DataBlockList: IBlock[] = [
     x: 3,
     y: 3,
     backgroundColor: "rgb(124 58 237)",
-    outlineColor: "rgb(139 92 246)",
   },
   {
+    id: 7,
     base: [
       BaseEnum.ENTITY,
       BaseEnum.ENTITY,
@@ -110,9 +111,9 @@ export const DataBlockList: IBlock[] = [
     x: 2,
     y: 3,
     backgroundColor: "rgb(74 222 128)",
-    outlineColor: "rgb(134 239 172)",
   },
   {
+    id: 8,
     base: [
       BaseEnum.NONE,
       BaseEnum.ENTITY,
@@ -124,9 +125,9 @@ export const DataBlockList: IBlock[] = [
     x: 2,
     y: 3,
     backgroundColor: "rgb(136 19 55)",
-    outlineColor: "rgb(76 5 25)",
   },
   {
+    id: 9,
     base: [
       BaseEnum.ENTITY,
       BaseEnum.ENTITY,
@@ -138,9 +139,9 @@ export const DataBlockList: IBlock[] = [
     x: 2,
     y: 3,
     backgroundColor: "rgb(101 163 13)",
-    outlineColor: "rgb(132 204 22)",
   },
   {
+    id: 10,
     base: [
       BaseEnum.ENTITY,
       BaseEnum.NONE,
@@ -152,9 +153,9 @@ export const DataBlockList: IBlock[] = [
     x: 2,
     y: 3,
     backgroundColor: "rgb(30 58 138)",
-    outlineColor: "rgb(23 37 84)",
   },
   {
+    id: 11,
     base: [
       BaseEnum.ENTITY,
       BaseEnum.NONE,
@@ -169,13 +170,12 @@ export const DataBlockList: IBlock[] = [
     x: 3,
     y: 3,
     backgroundColor: "rgb(59 130 246)",
-    outlineColor: "rgb(96 165 250)",
   },
   {
+    id: 12,
     base: [BaseEnum.ENTITY, BaseEnum.NONE, BaseEnum.ENTITY, BaseEnum.ENTITY],
     x: 2,
     y: 2,
     backgroundColor: "rgb(56 189 248)",
-    outlineColor: "rgb(125 211 252)",
   },
 ];

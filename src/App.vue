@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { type IBlock, type IPosition, BaseEnum } from "@/types";
 import { DataBlockList } from "@/data";
 import { getPositions, solvePuzzle } from "@/utils";
@@ -9,36 +9,51 @@ import CanvaBlock from "@/components/CanvaBlock.vue";
 const length = ref<number>(11);
 const height = ref<number>(5);
 const blockList = ref<IBlock[]>([...DataBlockList]);
-const selectedBlock = ref<number | null>(null);
-const blockPositionList = ref<IPosition[]>([]);
+const selectedBlockId = ref<number | null>(null);
+const selectedBlockPositionList = ref<IPosition[]>([]);
 const solutions = ref<Array<number[]>>([]);
-const selectedSolutionIndex = ref<number>(0);
+const viewSolutionIndex = ref<number>(0);
 
-function handleSelectBlock(index: number) {
-  const block = blockList.value[index];
+const base = computed(() => new Array(length.value * height.value).fill(0));
+const _base = ref<number[]>([
+  2, 4, 4, 4, 4, 11, 11, 11, 9, 9, 9, 2, 2, 0, 4, 0, 0, 0, 11, 9, 12, 9, 2, 0,
+  0, 0, 0, 0, 0, 11, 8, 12, 12, 0, 0, 0, 0, 0, 0, 0, 8, 8, 7, 7, 0, 0, 0, 0, 0,
+  0, 0, 8, 7, 7, 7,
+]);
+
+function handleSelectBlock(id: number) {
+  const block = blockList.value.find((b) => b.id === id);
   if (!block) return;
 
-  if (selectedBlock.value === index) {
-    selectedBlock.value = null;
-    blockPositionList.value = [];
+  if (selectedBlockId.value === id) {
+    selectedBlockId.value = null;
+    selectedBlockPositionList.value = [];
     return;
   }
-  selectedBlock.value = index;
+  selectedBlockId.value = id;
   const result = getPositions(block);
-  blockPositionList.value = [...result];
+  selectedBlockPositionList.value = [...result];
+}
+
+function viewNextSolution() {
+  viewSolutionIndex.value = viewSolutionIndex.value + 1;
+  if (viewSolutionIndex.value === solutions.value.length) {
+    viewSolutionIndex.value = 0;
+  }
 }
 
 function solve() {
-  selectedSolutionIndex.value = 0;
-  const result = solvePuzzle(length.value, height.value, blockList.value);
-  solutions.value = result;
-}
+  viewSolutionIndex.value = 0;
+  const templateBlockIdList = [...new Set(_base.value)].filter((e) => e !== 0);
+  const _blockList: IBlock[] = blockList.value.filter(
+    (b) => !templateBlockIdList.includes(b.id),
+  );
 
-function nextSolution() {
-  selectedSolutionIndex.value = selectedSolutionIndex.value + 1;
-  if (selectedSolutionIndex.value === solutions.value.length) {
-    selectedSolutionIndex.value = 0;
-  }
+  const result = solvePuzzle(
+    { base: _base.value, x: length.value, y: height.value },
+    _blockList,
+  );
+  solutions.value = result;
 }
 </script>
 
@@ -51,21 +66,22 @@ function nextSolution() {
       >
         <template v-if="!solutions.length">
           <component
-            v-for="(block, index) in length * height"
-            :is="CanvaSpot"
+            v-for="value in _base"
+            :is="value === 0 ? CanvaSpot : CanvaBlock"
+            :block="blockList.find((b) => b.id === value)"
           ></component>
         </template>
         <template v-else>
           <component
-            v-for="value in solutions[selectedSolutionIndex]"
+            v-for="value in solutions[viewSolutionIndex]"
             :is="value === 0 ? CanvaSpot : CanvaBlock"
-            :block="blockList[value - 1]"
+            :block="blockList.find((b) => b.id === value)"
           ></component>
         </template>
       </div>
       <div class="flex flex-row gap-2">
-        <button class="w-28" @click="solve">Solve</button>
-        <button v-if="solutions.length > 1" class="w-28" @click="nextSolution">
+        <button class="w-24" @click="solve">Solve</button>
+        <button v-if="solutions.length" class="w-24" @click="viewNextSolution">
           Next
         </button>
       </div>
@@ -75,11 +91,11 @@ function nextSolution() {
       <div class="text-xl">Puzzle Blocks</div>
       <div class="flex flex-row items-start flex-wrap gap-6">
         <div
-          v-for="(block, index) in blockList"
+          v-for="block in blockList"
           class="p-3 grid gap-2 w-fit hover:cursor-pointer hover:outline outline-gray-500 outline-2 hover:bg-gray-800 rounded"
-          :class="selectedBlock === index && 'bg-gray-800'"
+          :class="selectedBlockId === block.id && 'bg-gray-800'"
           :style="`grid-template-columns: repeat(${block.x}, minmax(0, 1fr))`"
-          @click="handleSelectBlock(index)"
+          @click="handleSelectBlock(block.id)"
         >
           <template v-for="el in block.base">
             <div
@@ -96,11 +112,13 @@ function nextSolution() {
         </div>
       </div>
       <!-- Positions -->
-      <template v-if="selectedBlock !== null && blockPositionList.length">
+      <template
+        v-if="selectedBlockId !== null && selectedBlockPositionList.length"
+      >
         <div class="text-xl">Positions</div>
         <div class="flex flex-row items-start flex-wrap gap-6">
           <div
-            v-for="block in blockPositionList"
+            v-for="block in selectedBlockPositionList"
             class="p-3 grid gap-2 w-fit"
             :style="`grid-template-columns: repeat(${block.x}, minmax(0, 1fr))`"
           >

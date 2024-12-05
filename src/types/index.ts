@@ -5,8 +5,8 @@ export interface ICanva {
 }
 
 export interface IBlock extends IPosition {
+  id: number;
   backgroundColor: string;
-  outlineColor: string;
 }
 
 export interface IPosition {
