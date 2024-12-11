@@ -14,6 +14,9 @@ const selectedBlockPositionList = ref<IPosition[]>([]);
 const solutions = ref<Array<number[]>>([]);
 const viewSolutionIndex = ref<number>(0);
 
+const dragging = ref(false);
+const cursor = ref<{ top: number; left: number } | null>(null);
+
 const _base = ref<number[]>([
   2, 4, 4, 4, 4, 11, 11, 11, 9, 9, 9, 2, 2, 0, 4, 0, 0, 0, 11, 9, 12, 9, 2, 0,
   0, 0, 0, 0, 0, 11, 8, 12, 12, 0, 0, 0, 0, 0, 0, 0, 8, 8, 7, 7, 0, 0, 0, 0, 0,
@@ -68,7 +71,6 @@ function handlePositionSelect(event: Event, index: number): void {
 
   const container = document.createElement("div");
   container.appendChild(clone);
-  console.log(container.firstElementChild?.classList);
   container.style.position = "absolute";
   container.style.top = "10px";
   container.style.left = "10px";
@@ -76,10 +78,27 @@ function handlePositionSelect(event: Event, index: number): void {
   container.firstElementChild?.classList.remove("position");
   container.firstElementChild?.classList.add("clone");
 
+  container.addEventListener("pointerdown", handleDragStart);
+  container.addEventListener("pointermove", handleDragging);
+  window.addEventListener("pointerup", handleDragEnd);
+
   const canva = document.getElementById("canva");
   if (!canva) return;
   canva.appendChild(container);
   window.scrollTo(0, 0);
+}
+
+function handleDragStart() {
+  dragging.value = true;
+}
+
+function handleDragging(event: PointerEvent) {
+  if (!dragging.value) return;
+  console.log("Test Start Drag", event.clientX, event.clientY);
+}
+
+function handleDragEnd() {
+  dragging.value = false;
 }
 </script>
 
