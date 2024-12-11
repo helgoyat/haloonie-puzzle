@@ -6,6 +6,9 @@ import { getPositions, solvePuzzle } from "@/utils";
 import CanvaSpot from "@/components/CanvaSpot.vue";
 import CanvaBlock from "@/components/CanvaBlock.vue";
 
+const CURSOR_STEP = 50;
+const BLOCK_STEP = 48;
+
 const length = ref<number>(11);
 const height = ref<number>(5);
 const blockList = ref<IBlock[]>([...DataBlockList]);
@@ -15,7 +18,12 @@ const solutions = ref<Array<number[]>>([]);
 const viewSolutionIndex = ref<number>(0);
 
 const dragging = ref(false);
-const cursor = ref<{ top: number; left: number } | null>(null);
+const cursor = ref<{ x: number; y: number } | null>(null);
+
+const diff_up = ref(0);
+const diff_right = ref(0);
+const diff_down = ref(0);
+const diff_left = ref(0);
 
 const _base = ref<number[]>([
   2, 4, 4, 4, 4, 11, 11, 11, 9, 9, 9, 2, 2, 0, 4, 0, 0, 0, 11, 9, 12, 9, 2, 0,
@@ -84,22 +92,61 @@ function handlePositionSelect(event: Event, index: number): void {
   window.scrollTo(0, 0);
 }
 
-function handleDragStart() {
+function handleDragStart(event: PointerEvent) {
   dragging.value = true;
-
-  // const canva = document.getElementById("canva");
-  // if (!canva || !canva.children.length) return;
-  // const children = Array.from(canva.children);
-  // children.pop();
+  const { clientX, clientY } = event;
+  cursor.value = { x: clientX, y: clientY };
 }
 
 function handleDragging(event: PointerEvent) {
-  if (!dragging.value) return;
-  console.log("Dragging", event.clientX, event.clientY);
+  const canva = document.getElementById("canva");
+  const clonedPosition = document.getElementById("cloned-position");
+  if (!clonedPosition || !canva) return;
+  const { left: canva_left, top: canva_top } = canva.getBoundingClientRect();
+  const { left, top } = clonedPosition.getBoundingClientRect();
+
+  if (!dragging.value || !cursor.value) return;
+  const { clientX, clientY } = event;
+
+  if (clientX > cursor.value.x) {
+    diff_right.value += Math.round(clientX - cursor.value.x);
+    if (diff_right.value >= CURSOR_STEP) {
+      clonedPosition.style.left = left - canva_left + BLOCK_STEP + "px";
+      diff_right.value = 0;
+    }
+  }
+  if (clientX < cursor.value.x) {
+    diff_left.value += Math.round(cursor.value.x - clientX);
+    if (diff_left.value >= CURSOR_STEP) {
+      clonedPosition.style.left = left - canva_left - BLOCK_STEP + "px";
+      diff_left.value = 0;
+    }
+  }
+  if (clientY > cursor.value.y) {
+    diff_down.value += Math.round(clientY - cursor.value.y);
+    if (diff_down.value >= CURSOR_STEP) {
+      clonedPosition.style.top = top - canva_top + BLOCK_STEP + "px";
+      diff_down.value = 0;
+    }
+  }
+  if (clientY < cursor.value.y) {
+    diff_up.value += Math.round(cursor.value.y - clientY);
+    if (diff_up.value >= CURSOR_STEP) {
+      clonedPosition.style.top = top - canva_top - BLOCK_STEP + "px";
+      diff_up.value = 0;
+    }
+  }
+
+  cursor.value = { x: clientX, y: clientY };
 }
 
 function handleDragEnd() {
   dragging.value = false;
+  cursor.value = null;
+  diff_up.value = 0;
+  diff_right.value = 0;
+  diff_down.value = 0;
+  diff_left.value = 0;
 }
 </script>
 
