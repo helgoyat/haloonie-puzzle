@@ -6,7 +6,6 @@ import { getPositions, solvePuzzle } from "@/utils";
 import CanvaSpot from "@/components/CanvaSpot.vue";
 import CanvaBlock from "@/components/CanvaBlock.vue";
 
-const CURSOR_STEP = 50;
 const BLOCK_STEP = 48;
 
 const length = ref<number>(11);
@@ -19,6 +18,7 @@ const viewSolutionIndex = ref<number>(0);
 
 const dragging = ref(false);
 const cursor = ref<{ x: number; y: number } | null>(null);
+const cloneData = ref<{ blockId: number; positionIndex: number } | null>(null);
 
 const diff_up = ref(0);
 const diff_right = ref(0);
@@ -31,6 +31,10 @@ const _base = ref<number[]>([
   0, 0, 8, 7, 7, 7,
 ]);
 const base = computed(() => new Array(length.value * height.value).fill(0));
+const clonePosition = computed((): IPosition | null => {
+  if (!cloneData.value) return null;
+  return selectedBlockPositionList.value[cloneData.value.positionIndex] ?? null;
+});
 
 function handleSelectBlock(id: number) {
   const block = blockList.value.find((b) => b.id === id);
@@ -68,6 +72,7 @@ function solve() {
 }
 
 function handlePositionSelect(event: Event, index: number): void {
+  if (!selectedBlockId.value || cloneData.value) return;
   const node = document.getElementById(index.toString());
   if (!node) return;
   const clone = node.cloneNode(true);
@@ -88,6 +93,7 @@ function handlePositionSelect(event: Event, index: number): void {
 
   const canva = document.getElementById("canva");
   if (!canva) return;
+  cloneData.value = { blockId: selectedBlockId.value, positionIndex: index };
   canva.appendChild(container);
   window.scrollTo(0, 0);
 }
@@ -101,37 +107,45 @@ function handleDragStart(event: PointerEvent) {
 function handleDragging(event: PointerEvent) {
   const canva = document.getElementById("canva");
   const clonedPosition = document.getElementById("cloned-position");
-  if (!clonedPosition || !canva) return;
+  if (!clonedPosition || !canva || !clonePosition.value) return;
   const { left: canva_left, top: canva_top } = canva.getBoundingClientRect();
   const { left, top } = clonedPosition.getBoundingClientRect();
 
   if (!dragging.value || !cursor.value) return;
   const { clientX, clientY } = event;
 
-  if (clientX > cursor.value.x) {
+  if (
+    clientX > cursor.value.x &&
+    left - canva_left <
+      10 + BLOCK_STEP * length.value - BLOCK_STEP * clonePosition.value.x
+  ) {
     diff_right.value += Math.round(clientX - cursor.value.x);
-    if (diff_right.value >= CURSOR_STEP) {
+    if (diff_right.value >= BLOCK_STEP) {
       clonedPosition.style.left = left - canva_left + BLOCK_STEP + "px";
       diff_right.value = 0;
     }
   }
-  if (clientX < cursor.value.x) {
+  if (clientX < cursor.value.x && left - canva_left > 10) {
     diff_left.value += Math.round(cursor.value.x - clientX);
-    if (diff_left.value >= CURSOR_STEP) {
+    if (diff_left.value >= BLOCK_STEP) {
       clonedPosition.style.left = left - canva_left - BLOCK_STEP + "px";
       diff_left.value = 0;
     }
   }
-  if (clientY > cursor.value.y) {
+  if (
+    clientY > cursor.value.y &&
+    top - canva_top <
+      10 + BLOCK_STEP * height.value - BLOCK_STEP * clonePosition.value.y
+  ) {
     diff_down.value += Math.round(clientY - cursor.value.y);
-    if (diff_down.value >= CURSOR_STEP) {
+    if (diff_down.value >= BLOCK_STEP) {
       clonedPosition.style.top = top - canva_top + BLOCK_STEP + "px";
       diff_down.value = 0;
     }
   }
-  if (clientY < cursor.value.y) {
+  if (clientY < cursor.value.y && top - canva_top > 10) {
     diff_up.value += Math.round(cursor.value.y - clientY);
-    if (diff_up.value >= CURSOR_STEP) {
+    if (diff_up.value >= BLOCK_STEP) {
       clonedPosition.style.top = top - canva_top - BLOCK_STEP + "px";
       diff_up.value = 0;
     }
