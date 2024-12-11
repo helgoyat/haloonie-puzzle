@@ -23,11 +23,6 @@ const _base = ref<number[]>([
   0, 0, 8, 7, 7, 7,
 ]);
 const base = computed(() => new Array(length.value * height.value).fill(0));
-const selectedBlockBackgroundColor = computed(
-  (): string =>
-    blockList.value.find((b) => b.id === selectedBlockId.value)
-      ?.backgroundColor || "",
-);
 
 function handleSelectBlock(id: number) {
   const block = blockList.value.find((b) => b.id === id);
@@ -71,6 +66,7 @@ function handlePositionSelect(event: Event, index: number): void {
 
   const container = document.createElement("div");
   container.appendChild(clone);
+  container.id = "cloned-position";
   container.style.position = "absolute";
   container.style.top = "10px";
   container.style.left = "10px";
@@ -90,11 +86,16 @@ function handlePositionSelect(event: Event, index: number): void {
 
 function handleDragStart() {
   dragging.value = true;
+
+  // const canva = document.getElementById("canva");
+  // if (!canva || !canva.children.length) return;
+  // const children = Array.from(canva.children);
+  // children.pop();
 }
 
 function handleDragging(event: PointerEvent) {
   if (!dragging.value) return;
-  console.log("Test Start Drag", event.clientX, event.clientY);
+  console.log("Dragging", event.clientX, event.clientY);
 }
 
 function handleDragEnd() {
