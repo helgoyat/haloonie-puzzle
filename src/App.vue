@@ -61,15 +61,13 @@ function viewNextSolution() {
 
 function solve() {
   viewSolutionIndex.value = 0;
-  const templateBlockIdList = [...new Set(_baseTemplate.value)].filter(
-    (e) => e !== 0,
-  );
+  const templateBlockIdList = [...new Set(base.value)].filter((e) => e !== 0);
   const _blockList: IBlock[] = blockList.value.filter(
     (b) => !templateBlockIdList.includes(b.id),
   );
 
   const result = solvePuzzle(
-    { base: _baseTemplate.value, x: length.value, y: height.value },
+    { base: base.value, x: length.value, y: height.value },
     _blockList,
   );
   solutions.value = result;
@@ -181,11 +179,20 @@ function handleDragEnd() {
 
 function handleAddClone() {
   if (!cloneData.value) return;
+  const cloneElement = document.getElementById("clone");
+  const canva = document.getElementById("canva");
+  if (!cloneElement || !canva) return;
   const blockToAdd =
     selectedBlockPositionList.value[cloneData.value!.positionIndex];
   if (!blockToAdd) return;
 
-  const entryIndex = 0;
+  const { left: canva_left, top: canva_top } = canva.getBoundingClientRect();
+  const { left, top } = cloneElement.getBoundingClientRect();
+
+  const x = (left - canva_left - 10) / BLOCK_STEP;
+  const y = (top - canva_top - 10) / BLOCK_STEP;
+  const entryIndex = y * length.value + x;
+  if (entryIndex < 0 && entryIndex > base.value.length - 1) return;
 
   const result = addTemplateBlock(
     { x: length.value, y: height.value, base: base.value },
@@ -196,7 +203,7 @@ function handleAddClone() {
   if (!result) {
     alert("Blocks cannot overlap.");
     return;
-  };
+  }
   base.value = result;
   handleDeleteClone();
 }
