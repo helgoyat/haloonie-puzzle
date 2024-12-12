@@ -6,7 +6,7 @@ html {
   scroll-behavior: smooth;
 }
 body {
-  @apply bg-gray-800 min-w-[400px];
+  @apply bg-gray-800 min-w-[800px];
 }
 button {
   @apply px-4 py-3 bg-gray-900 hover:bg-gray-950 text-white rounded;
