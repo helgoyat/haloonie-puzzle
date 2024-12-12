@@ -2,7 +2,7 @@
 import { ref, computed } from "vue";
 import { type IBlock, type IPosition, BaseEnum } from "@/types";
 import { DataBlockList } from "@/data";
-import { getPositions, solvePuzzle } from "@/utils";
+import { addTemplateBlock, getPositions, solvePuzzle } from "@/utils";
 import CanvaSpot from "@/components/CanvaSpot.vue";
 import CanvaBlock from "@/components/CanvaBlock.vue";
 
@@ -16,6 +16,8 @@ const selectedBlockPositionList = ref<IPosition[]>([]);
 const solutions = ref<Array<number[]>>([]);
 const viewSolutionIndex = ref<number>(0);
 
+const base = ref<number[]>(new Array(length.value * height.value).fill(0));
+
 const dragging = ref(false);
 const cursor = ref<{ x: number; y: number } | null>(null);
 const cloneData = ref<{ blockId: number; positionIndex: number } | null>(null);
@@ -25,18 +27,18 @@ const diff_right = ref(0);
 const diff_down = ref(0);
 const diff_left = ref(0);
 
-const _base = ref<number[]>([
+const _baseTemplate = ref<number[]>([
   2, 4, 4, 4, 4, 11, 11, 11, 9, 9, 9, 2, 2, 0, 4, 0, 0, 0, 11, 9, 12, 9, 2, 0,
   0, 0, 0, 0, 0, 11, 8, 12, 12, 0, 0, 0, 0, 0, 0, 0, 8, 8, 7, 7, 0, 0, 0, 0, 0,
   0, 0, 8, 7, 7, 7,
 ]);
-const base = computed(() => new Array(length.value * height.value).fill(0));
 const clonePosition = computed((): IPosition | null => {
   if (!cloneData.value) return null;
   return selectedBlockPositionList.value[cloneData.value.positionIndex] ?? null;
 });
 
 function handleSelectBlock(id: number) {
+  if (cloneData.value) return;
   const block = blockList.value.find((b) => b.id === id);
   if (!block) return;
 
@@ -59,13 +61,15 @@ function viewNextSolution() {
 
 function solve() {
   viewSolutionIndex.value = 0;
-  const templateBlockIdList = [...new Set(_base.value)].filter((e) => e !== 0);
+  const templateBlockIdList = [...new Set(_baseTemplate.value)].filter(
+    (e) => e !== 0,
+  );
   const _blockList: IBlock[] = blockList.value.filter(
     (b) => !templateBlockIdList.includes(b.id),
   );
 
   const result = solvePuzzle(
-    { base: _base.value, x: length.value, y: height.value },
+    { base: _baseTemplate.value, x: length.value, y: height.value },
     _blockList,
   );
   solutions.value = result;
@@ -79,13 +83,25 @@ function handlePositionSelect(event: Event, index: number): void {
 
   const container = document.createElement("div");
   container.appendChild(clone);
-  container.id = "cloned-position";
+  container.id = "clone";
   container.style.position = "absolute";
   container.style.top = "10px";
   container.style.left = "10px";
 
   container.firstElementChild?.classList.remove("position");
   container.firstElementChild?.classList.add("clone");
+
+  const deleteBtn = document.createElement("div");
+  deleteBtn.classList.add("delete-btn");
+  deleteBtn.innerHTML = "<span class='material-icons-outlined'>close</span>";
+  deleteBtn.addEventListener("click", handleDeleteClone);
+  container.appendChild(deleteBtn);
+
+  const confirmBtn = document.createElement("div");
+  confirmBtn.classList.add("confirm-btn");
+  confirmBtn.innerHTML = "<span class='material-icons-outlined'>check</span>";
+  confirmBtn.addEventListener("click", handleAddClone);
+  container.appendChild(confirmBtn);
 
   container.addEventListener("pointerdown", handleDragStart);
   container.addEventListener("pointermove", handleDragging);
@@ -106,10 +122,10 @@ function handleDragStart(event: PointerEvent) {
 
 function handleDragging(event: PointerEvent) {
   const canva = document.getElementById("canva");
-  const clonedPosition = document.getElementById("cloned-position");
-  if (!clonedPosition || !canva || !clonePosition.value) return;
+  const cloneElement = document.getElementById("clone");
+  if (!cloneElement || !canva || !clonePosition.value) return;
   const { left: canva_left, top: canva_top } = canva.getBoundingClientRect();
-  const { left, top } = clonedPosition.getBoundingClientRect();
+  const { left, top } = cloneElement.getBoundingClientRect();
 
   if (!dragging.value || !cursor.value) return;
   const { clientX, clientY } = event;
@@ -121,14 +137,14 @@ function handleDragging(event: PointerEvent) {
   ) {
     diff_right.value += Math.round(clientX - cursor.value.x);
     if (diff_right.value >= BLOCK_STEP) {
-      clonedPosition.style.left = left - canva_left + BLOCK_STEP + "px";
+      cloneElement.style.left = left - canva_left + BLOCK_STEP + "px";
       diff_right.value = 0;
     }
   }
   if (clientX < cursor.value.x && left - canva_left > 10) {
     diff_left.value += Math.round(cursor.value.x - clientX);
     if (diff_left.value >= BLOCK_STEP) {
-      clonedPosition.style.left = left - canva_left - BLOCK_STEP + "px";
+      cloneElement.style.left = left - canva_left - BLOCK_STEP + "px";
       diff_left.value = 0;
     }
   }
@@ -139,14 +155,14 @@ function handleDragging(event: PointerEvent) {
   ) {
     diff_down.value += Math.round(clientY - cursor.value.y);
     if (diff_down.value >= BLOCK_STEP) {
-      clonedPosition.style.top = top - canva_top + BLOCK_STEP + "px";
+      cloneElement.style.top = top - canva_top + BLOCK_STEP + "px";
       diff_down.value = 0;
     }
   }
   if (clientY < cursor.value.y && top - canva_top > 10) {
     diff_up.value += Math.round(cursor.value.y - clientY);
     if (diff_up.value >= BLOCK_STEP) {
-      clonedPosition.style.top = top - canva_top - BLOCK_STEP + "px";
+      cloneElement.style.top = top - canva_top - BLOCK_STEP + "px";
       diff_up.value = 0;
     }
   }
@@ -161,6 +177,35 @@ function handleDragEnd() {
   diff_right.value = 0;
   diff_down.value = 0;
   diff_left.value = 0;
+}
+
+function handleAddClone() {
+  if (!cloneData.value) return;
+  const blockToAdd =
+    selectedBlockPositionList.value[cloneData.value!.positionIndex];
+  if (!blockToAdd) return;
+
+  const entryIndex = 0;
+
+  const result = addTemplateBlock(
+    { x: length.value, y: height.value, base: base.value },
+    blockToAdd,
+    cloneData.value.blockId,
+    entryIndex,
+  );
+  if (!result) {
+    alert("Blocks cannot overlap.");
+    return;
+  };
+  base.value = result;
+  handleDeleteClone();
+}
+
+function handleDeleteClone() {
+  const cloneElement = document.getElementById("clone");
+  if (!cloneElement) return;
+  cloneElement.remove();
+  cloneData.value = null;
 }
 </script>
 
@@ -254,6 +299,12 @@ function handleDragEnd() {
   @apply hover:cursor-pointer hover:outline outline-gray-500 outline-2 hover:bg-gray-600;
 }
 .clone {
-  @apply p-[6px] rounded outline-dashed outline-white outline-[3px] hover:cursor-grab hover:outline-rose-600;
+  @apply p-[6px] relative rounded outline-dashed outline-gray-400 outline-[3px] hover:cursor-grab hover:outline-gray-100;
+}
+.delete-btn {
+  @apply absolute -top-3 -left-3 w-6 h-6 bg-rose-600 rounded-full hover:cursor-pointer;
+}
+.confirm-btn {
+  @apply absolute -top-3 -right-3 w-6 h-6 bg-green-500 rounded-full hover:cursor-pointer;
 }
 </style>

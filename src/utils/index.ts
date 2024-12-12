@@ -86,20 +86,19 @@ export function solvePuzzle(
   function fit(canva: ICanva, blocks: Record<number, IPosition[]>) {
     outer_loop: for (const spotKey in canva.base) {
       const index = parseInt(spotKey);
-      const line = getLine(index, canva.x);
 
       for (const blockKey in blocks) {
-        const key = parseInt(blockKey);
+        const blockId = parseInt(blockKey);
         const positions = blocks[blockKey];
 
         for (const positionKey in positions) {
           const position = positions[positionKey];
 
-          const res = addBlock(canva, position, key, index, line);
+          const res = addBlock(canva, position, blockId, index);
           if (res) {
             const updatedCanva = { base: res, x: canva.x, y: canva.y };
             const updatedBlocks = { ...blocks };
-            delete updatedBlocks[key];
+            delete updatedBlocks[blockId];
 
             if (!res.some((e) => e === BaseEnum.NONE)) {
               results.push(res);
@@ -124,11 +123,11 @@ export function solvePuzzle(
 function addBlock(
   canva: ICanva,
   position: IPosition,
-  id: number,
+  blockId: number,
   entryIndex: number,
-  entryLine: number,
 ): number[] | null {
   const result = [...canva.base];
+  const entryLine = getLine(entryIndex, canva.x);
 
   const fitInX = entryLine === getLine(entryIndex + position.x - 1, canva.x);
   const fitInY = entryLine + position.y - 1 <= canva.y;
@@ -152,7 +151,9 @@ function addBlock(
 
       if (result[spotIndex] === BaseEnum.NONE) {
         result[spotIndex] =
-          position.base[cursorIndex] === BaseEnum.ENTITY ? id : BaseEnum.NONE;
+          position.base[cursorIndex] === BaseEnum.ENTITY
+            ? blockId
+            : BaseEnum.NONE;
       } else if (
         result[spotIndex] !== BaseEnum.NONE &&
         position.base[cursorIndex] !== BaseEnum.NONE
@@ -173,4 +174,57 @@ function addBlock(
     .some((e) => e === BaseEnum.NONE);
 
   return isValid ? result : null;
+}
+
+export function addTemplateBlock(
+  canva: ICanva,
+  position: IPosition,
+  blockId: number,
+  entryIndex: number,
+): number[] | null {
+  const result = [...canva.base];
+  const entryLine = getLine(entryIndex, canva.x);
+
+  const fitInX = entryLine === getLine(entryIndex + position.x - 1, canva.x);
+  const fitInY = entryLine + position.y - 1 <= canva.y;
+
+  const fitInCanva = fitInX && fitInY;
+
+  if (!fitInCanva) return null;
+
+  const firstEntityIndex: number = position.base.findIndex(
+    (e) => e === BaseEnum.ENTITY,
+  );
+  let firstEntitySpotIndex: number | null = null;
+  let overlap = false;
+
+  for (let y = 0; y < position.y; y++) {
+    if (overlap) break;
+
+    for (let x = 0; x < position.x; x++) {
+      const spotIndex = entryIndex + x + y * canva.x;
+      const cursorIndex = x + y * position.x;
+
+      if (result[spotIndex] === BaseEnum.NONE) {
+        result[spotIndex] =
+          position.base[cursorIndex] === BaseEnum.ENTITY
+            ? blockId
+            : BaseEnum.NONE;
+      } else if (
+        result[spotIndex] !== BaseEnum.NONE &&
+        position.base[cursorIndex] !== BaseEnum.NONE
+      ) {
+        overlap = true;
+        break;
+      }
+
+      if (cursorIndex === firstEntityIndex) {
+        firstEntitySpotIndex = spotIndex;
+      }
+    }
+  }
+
+  if (overlap || firstEntitySpotIndex === null) return null;
+
+  return result;
 }
