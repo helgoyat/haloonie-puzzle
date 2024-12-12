@@ -59,6 +59,16 @@ function viewNextSolution() {
   }
 }
 
+function reset() {
+  base.value = new Array(length.value * height.value).fill(0);
+  solutions.value = [];
+  viewSolutionIndex.value = 0;
+}
+
+function useTemplate() {
+  base.value = [..._baseTemplate.value];
+}
+
 function solve() {
   viewSolutionIndex.value = 0;
   const templateBlockIdList = [...new Set(base.value)].filter((e) => e !== 0);
@@ -240,8 +250,20 @@ function handleDeleteClone() {
         </template>
       </div>
       <div class="flex flex-row gap-2">
-        <button class="w-24" @click="solve">Solve</button>
-        <button v-if="solutions.length > 1" class="w-24" @click="viewNextSolution">
+        <button v-if="!solutions.length" class="w-28" @click="useTemplate">
+          Template
+        </button>
+        <button v-if="solutions.length" class="w-28" @click="reset">
+          Reset
+        </button>
+        <button class="w-28" :disabled="!!solutions.length" @click="solve">
+          Solve
+        </button>
+        <button
+          v-if="solutions.length > 1"
+          class="w-28"
+          @click="viewNextSolution"
+        >
           Next
         </button>
       </div>

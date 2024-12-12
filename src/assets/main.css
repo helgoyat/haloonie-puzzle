@@ -11,3 +11,6 @@ body {
 button {
   @apply px-4 py-3 bg-gray-900 hover:bg-gray-950 text-white rounded;
 }
+button:disabled {
+  @apply bg-gray-700 text-gray-400;
+}
