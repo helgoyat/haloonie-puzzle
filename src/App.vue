@@ -241,7 +241,7 @@ function handleDeleteClone() {
       </div>
       <div class="flex flex-row gap-2">
         <button class="w-24" @click="solve">Solve</button>
-        <button v-if="solutions.length" class="w-24" @click="viewNextSolution">
+        <button v-if="solutions.length > 1" class="w-24" @click="viewNextSolution">
           Next
         </button>
       </div>
