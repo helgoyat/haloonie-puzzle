@@ -93,8 +93,8 @@ function handlePositionSelect(event: Event, index: number): void {
   container.appendChild(clone);
   container.id = "clone";
   container.style.position = "absolute";
-  container.style.top = "10px";
-  container.style.left = "10px";
+  container.style.top = "0px";
+  container.style.left = "0px";
 
   container.firstElementChild?.classList.remove("position");
   container.firstElementChild?.classList.add("clone");
@@ -111,8 +111,8 @@ function handlePositionSelect(event: Event, index: number): void {
   confirmBtn.addEventListener("click", handleAddClone);
   container.appendChild(confirmBtn);
 
-  container.addEventListener("pointerdown", handleDragStart);
-  container.addEventListener("pointermove", handleDragging);
+  window.addEventListener("pointerdown", handleDragStart);
+  window.addEventListener("pointermove", handleDragging);
   window.addEventListener("pointerup", handleDragEnd);
 
   const canva = document.getElementById("canva");
@@ -129,19 +129,20 @@ function handleDragStart(event: PointerEvent) {
 }
 
 function handleDragging(event: PointerEvent) {
+  if (!dragging.value || !cursor.value) return;
   const canva = document.getElementById("canva");
   const cloneElement = document.getElementById("clone");
   if (!cloneElement || !canva || !clonePosition.value) return;
+
   const { left: canva_left, top: canva_top } = canva.getBoundingClientRect();
   const { left, top } = cloneElement.getBoundingClientRect();
 
-  if (!dragging.value || !cursor.value) return;
   const { clientX, clientY } = event;
 
   if (
     clientX > cursor.value.x &&
     left - canva_left <
-      10 + BLOCK_STEP * length.value - BLOCK_STEP * clonePosition.value.x
+      BLOCK_STEP * length.value - BLOCK_STEP * clonePosition.value.x
   ) {
     diff_right.value += Math.round(clientX - cursor.value.x);
     if (diff_right.value >= BLOCK_STEP) {
@@ -149,7 +150,7 @@ function handleDragging(event: PointerEvent) {
       diff_right.value = 0;
     }
   }
-  if (clientX < cursor.value.x && left - canva_left > 10) {
+  if (clientX < cursor.value.x && left - canva_left > 0) {
     diff_left.value += Math.round(cursor.value.x - clientX);
     if (diff_left.value >= BLOCK_STEP) {
       cloneElement.style.left = left - canva_left - BLOCK_STEP + "px";
@@ -159,7 +160,7 @@ function handleDragging(event: PointerEvent) {
   if (
     clientY > cursor.value.y &&
     top - canva_top <
-      10 + BLOCK_STEP * height.value - BLOCK_STEP * clonePosition.value.y
+      BLOCK_STEP * height.value - BLOCK_STEP * clonePosition.value.y
   ) {
     diff_down.value += Math.round(clientY - cursor.value.y);
     if (diff_down.value >= BLOCK_STEP) {
@@ -167,7 +168,7 @@ function handleDragging(event: PointerEvent) {
       diff_down.value = 0;
     }
   }
-  if (clientY < cursor.value.y && top - canva_top > 10) {
+  if (clientY < cursor.value.y && top - canva_top > 0) {
     diff_up.value += Math.round(cursor.value.y - clientY);
     if (diff_up.value >= BLOCK_STEP) {
       cloneElement.style.top = top - canva_top - BLOCK_STEP + "px";
@@ -199,8 +200,8 @@ function handleAddClone() {
   const { left: canva_left, top: canva_top } = canva.getBoundingClientRect();
   const { left, top } = cloneElement.getBoundingClientRect();
 
-  const x = (left - canva_left - 10) / BLOCK_STEP;
-  const y = (top - canva_top - 10) / BLOCK_STEP;
+  const x = (left - canva_left) / BLOCK_STEP;
+  const y = (top - canva_top) / BLOCK_STEP;
   const entryIndex = y * length.value + x;
   if (entryIndex < 0 && entryIndex > base.value.length - 1) return;
 
@@ -223,15 +224,18 @@ function handleDeleteClone() {
   if (!cloneElement) return;
   cloneElement.remove();
   cloneData.value = null;
+  window.removeEventListener("pointerdown", handleDragStart);
+  window.removeEventListener("pointermove", handleDragging);
+  window.removeEventListener("pointerup", handleDragEnd);
 }
 </script>
 
 <template>
   <main class="flex flex-col justify-center items-center gap-4">
-    <div class="flex flex-col justify-center items-center h-screen gap-6">
+    <div class="flex flex-col justify-center items-center h-screen gap-8">
       <div
         id="canva"
-        class="relative p-4 outline-dashed outline-4 outline-gray-900 rounded bg-gray-700 grid gap-2"
+        class="relative p-2 outline-dashed outline-4 outline-gray-900 rounded bg-gray-700 grid gap-2"
         :style="`grid-template-columns: repeat(${length}, minmax(0, 1fr))`"
       >
         <template v-if="!solutions.length">
@@ -249,19 +253,27 @@ function handleDeleteClone() {
           ></component>
         </template>
       </div>
-      <div class="flex flex-row gap-2">
-        <button v-if="!solutions.length" class="w-28" @click="useTemplate">
+      <div class="flex flex-row gap-3">
+        <button
+          v-if="!solutions.length"
+          class="w-28 select-none"
+          @click="useTemplate"
+        >
           Template
         </button>
-        <button v-if="solutions.length" class="w-28" @click="reset">
+        <button v-if="solutions.length" class="w-28 select-none" @click="reset">
           Reset
         </button>
-        <button class="w-28" :disabled="!!solutions.length" @click="solve">
+        <button
+          class="w-28 select-none"
+          :disabled="!!solutions.length"
+          @click="solve"
+        >
           Solve
         </button>
         <button
           v-if="solutions.length > 1"
-          class="w-28"
+          class="w-28 select-none"
           @click="viewNextSolution"
         >
           Next
@@ -328,12 +340,12 @@ function handleDeleteClone() {
   @apply hover:cursor-pointer hover:outline outline-gray-500 outline-2 hover:bg-gray-600;
 }
 .clone {
-  @apply p-[6px] relative rounded outline-dashed outline-gray-400 outline-[3px] hover:cursor-grab hover:outline-gray-100;
+  @apply p-2 relative rounded outline-dashed outline-gray-400 outline-[3px] cursor-grab active:cursor-grabbing hover:outline-gray-100;
 }
 .delete-btn {
-  @apply absolute -top-3 -left-3 w-6 h-6 bg-rose-600 rounded-full hover:cursor-pointer;
+  @apply absolute -top-3 -left-3 w-6 h-6 bg-rose-600 rounded-full hover:cursor-pointer select-none;
 }
 .confirm-btn {
-  @apply absolute -top-3 -right-3 w-6 h-6 bg-green-500 rounded-full hover:cursor-pointer;
+  @apply absolute -top-3 -right-3 w-6 h-6 bg-green-500 rounded-full hover:cursor-pointer select-none;
 }
 </style>
