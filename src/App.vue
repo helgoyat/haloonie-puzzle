@@ -211,8 +211,8 @@ function handleAddClone() {
     cloneData.value.blockId,
     entryIndex,
   );
-  if (!result) {
-    alert("Blocks cannot overlap.");
+  if (typeof result === "string") {
+    alert(result);
     return;
   }
   base.value = result;
@@ -232,10 +232,12 @@ function handleDeleteClone() {
 
 <template>
   <main class="flex flex-col justify-center items-center gap-4">
-    <div class="flex flex-col justify-center items-center h-screen gap-8">
+    <div
+      class="flex flex-col justify-center items-center h-screen gap-8 bg-gray-800 w-full"
+    >
       <div
         id="canva"
-        class="relative p-2 outline-dashed outline-4 outline-gray-900 rounded bg-gray-700 grid gap-2"
+        class="relative p-2 outline-dashed outline-4 outline-gray-950 rounded bg-gray-800 grid gap-2"
         :style="`grid-template-columns: repeat(${length}, minmax(0, 1fr))`"
       >
         <template v-if="!solutions.length">
@@ -281,13 +283,13 @@ function handleDeleteClone() {
       </div>
     </div>
     <!-- Puzzle Blocks -->
-    <div class="w-full bg-gray-700 p-12 text-white flex flex-col gap-8">
+    <div class="w-full bg-gray-900 p-12 text-white flex flex-col gap-8">
       <div class="text-xl">Puzzle Blocks</div>
       <div class="flex flex-row items-start flex-wrap gap-6">
         <div
           v-for="block in blockList"
-          class="p-3 grid gap-2 w-fit hover:cursor-pointer hover:outline outline-gray-500 outline-2 hover:bg-gray-800 rounded"
-          :class="selectedBlockId === block.id && 'bg-gray-800'"
+          class="p-3 grid gap-2 w-fit hover:cursor-pointer hover:bg-gray-800 rounded"
+          :class="selectedBlockId === block.id && 'outline-3 outline-gray-600'"
           :style="`grid-template-columns: repeat(${block.x}, minmax(0, 1fr))`"
           @click="handleSelectBlock(block.id)"
         >
@@ -323,7 +325,7 @@ function handleDeleteClone() {
                 class="w-10 h-10"
                 :class="
                   el === BaseEnum.ENTITY
-                    ? 'rounded shadow-lg bg-gray-950'
+                    ? 'rounded shadow-lg bg-gray-400'
                     : 'bg-transparent'
                 "
               ></div>
@@ -334,18 +336,3 @@ function handleDeleteClone() {
     </div>
   </main>
 </template>
-
-<style lang="css">
-.position {
-  @apply hover:cursor-pointer hover:outline outline-gray-500 outline-2 hover:bg-gray-600;
-}
-.clone {
-  @apply p-2 relative rounded outline-dashed outline-gray-400 outline-[3px] cursor-grab active:cursor-grabbing hover:outline-gray-100;
-}
-.delete-btn {
-  @apply absolute -top-3 -left-3 w-6 h-6 bg-rose-600 rounded-full hover:cursor-pointer select-none;
-}
-.confirm-btn {
-  @apply absolute -top-3 -right-3 w-6 h-6 bg-green-500 rounded-full hover:cursor-pointer select-none;
-}
-</style>

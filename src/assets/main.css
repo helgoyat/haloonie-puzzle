@@ -1,16 +1,26 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 html {
   scroll-behavior: smooth;
 }
 body {
-  @apply bg-gray-800 min-w-[800px];
+  @apply bg-gray-900 min-w-2xl;
 }
 button {
-  @apply px-4 py-3 bg-gray-900 text-white rounded;
+  @apply px-4 py-3 bg-gray-900 text-white rounded hover:cursor-pointer;
 }
 button:disabled {
-  @apply text-gray-800;
+  @apply text-gray-700;
+}
+.position {
+  @apply hover:cursor-pointer hover:bg-gray-800;
+}
+.clone {
+  @apply p-2 relative rounded outline-dashed outline-gray-400 outline-[3px] cursor-grab active:cursor-grabbing hover:outline-gray-100;
+}
+.delete-btn {
+  @apply absolute -top-3 -left-3 w-6 h-6 bg-rose-600 rounded-full hover:cursor-pointer select-none;
+}
+.confirm-btn {
+  @apply absolute -top-3 -right-3 w-6 h-6 bg-green-500 rounded-full hover:cursor-pointer select-none;
 }

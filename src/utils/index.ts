@@ -181,8 +181,10 @@ export function addTemplateBlock(
   position: IPosition,
   blockId: number,
   entryIndex: number,
-): number[] | null {
+): number[] | string {
   const result = [...canva.base];
+  const isDuplicate = result.some((id) => id === blockId);
+  if (isDuplicate) return "This block is already present on the board.";
   const entryLine = getLine(entryIndex, canva.x);
 
   const fitInX = entryLine === getLine(entryIndex + position.x - 1, canva.x);
@@ -190,7 +192,7 @@ export function addTemplateBlock(
 
   const fitInCanva = fitInX && fitInY;
 
-  if (!fitInCanva) return null;
+  if (!fitInCanva) return "This block doesn't fit entirely in the board.";
 
   const firstEntityIndex: number = position.base.findIndex(
     (e) => e === BaseEnum.ENTITY,
@@ -224,7 +226,8 @@ export function addTemplateBlock(
     }
   }
 
-  if (overlap || firstEntitySpotIndex === null) return null;
+  if (overlap || firstEntitySpotIndex === null)
+    return "This block overlaps another.";
 
   return result;
 }
