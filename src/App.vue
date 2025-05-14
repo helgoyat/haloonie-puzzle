@@ -249,7 +249,10 @@ function handleDeleteClone() {
             </li>
             <li>
               Move the puzzle piece on the board using drag-and-drop
-              functionality. You can delete or confirm placement.
+              functionality. You can delete or confirm placement
+              <span class="text-red-500"
+                >(compatibility with all browsers is pending)</span
+              >.
             </li>
             <li>
               Click "Template" button to populate the board with a predefined
