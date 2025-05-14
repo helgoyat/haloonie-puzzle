@@ -232,8 +232,19 @@ function handleDeleteClone() {
 
 <template>
   <main class="flex flex-col justify-center items-center">
-    <div class="w-full p-12 m-4 text-white">
+    <div class="w-full p-12 text-white flex flex-col gap-4">
       <div class="text-xl">Instructions</div>
+      <ul class="list-disc list-inside">
+        <li>Select a puzzle shape and its position to place on the board.</li>
+        <li>
+          Move the puzzle piece on the board using drag-and-drop functionality.
+          You can delete or confirm placement.
+        </li>
+        <li>
+          Click "Template" button to populate the board with a predefined puzzle
+          template. Currently, one template is available, with more to come.
+        </li>
+      </ul>
     </div>
     <!-- Puzzle Board -->
     <div
