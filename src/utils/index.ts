@@ -185,8 +185,8 @@ export function addTemplateBlock(
   const result = [...canva.base];
   const isDuplicate = result.some((id) => id === blockId);
   if (isDuplicate) return "This block is already present on the board.";
-  const entryLine = getLine(entryIndex, canva.x);
 
+  const entryLine = getLine(entryIndex, canva.x);
   const fitInX = entryLine === getLine(entryIndex + position.x - 1, canva.x);
   const fitInY = entryLine + position.y - 1 <= canva.y;
 

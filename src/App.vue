@@ -119,7 +119,7 @@ function handlePositionSelect(event: Event, index: number): void {
   if (!canva) return;
   cloneData.value = { blockId: selectedBlockId.value, positionIndex: index };
   canva.appendChild(container);
-  window.scrollTo(0, 0);
+  window.scrollTo(0, document.getElementById("board")?.offsetTop ?? 0);
 }
 
 function handleDragStart(event: PointerEvent) {
@@ -231,8 +231,13 @@ function handleDeleteClone() {
 </script>
 
 <template>
-  <main class="flex flex-col justify-center items-center gap-4">
+  <main class="flex flex-col justify-center items-center">
+    <div class="w-full p-12 m-4 text-white">
+      <div class="text-xl">Instructions</div>
+    </div>
+    <!-- Puzzle Board -->
     <div
+      id="board"
       class="flex flex-col justify-center items-center h-screen gap-8 bg-gray-800 w-full"
     >
       <div
@@ -282,9 +287,11 @@ function handleDeleteClone() {
         </button>
       </div>
     </div>
-    <!-- Puzzle Blocks -->
-    <div class="w-full bg-gray-900 p-12 text-white flex flex-col gap-8">
-      <div class="text-xl">Puzzle Blocks</div>
+    <!-- Puzzle Shapes -->
+    <div
+      class="w-full bg-gray-900 p-12 text-white flex flex-col gap-8 min-h-screen"
+    >
+      <div class="text-xl">Puzzle Shapes</div>
       <div class="flex flex-row items-start flex-wrap gap-6">
         <div
           v-for="block in blockList"
