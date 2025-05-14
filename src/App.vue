@@ -232,19 +232,39 @@ function handleDeleteClone() {
 
 <template>
   <main class="flex flex-col justify-center items-center">
-    <div class="w-full p-12 text-white flex flex-col gap-4">
-      <div class="text-xl">Instructions</div>
-      <ul class="list-disc list-inside">
-        <li>Select a puzzle shape and its position to place on the board.</li>
-        <li>
-          Move the puzzle piece on the board using drag-and-drop functionality.
-          You can delete or confirm placement.
-        </li>
-        <li>
-          Click "Template" button to populate the board with a predefined puzzle
-          template. Currently, one template is available, with more to come.
-        </li>
-      </ul>
+    <div class="w-full p-12 text-white flex gap-4">
+      <div class="grow flex flex-col gap-4">
+        <div class="text-2xl">🧩 Background</div>
+        <div>
+          Inspired by my experience with IQ Puzzler, I recognized patterns in my
+          problem-solving approach. I realized these strategies could be
+          algorithmically replicated, leading me to develop an application
+          capable of solving easy-to-medium difficulty templates from the game.
+        </div>
+        <div class="text-2xl">📘 Instructions</div>
+        <div>
+          <ul class="list-disc list-inside">
+            <li>
+              Select a puzzle shape and its position to place on the board.
+            </li>
+            <li>
+              Move the puzzle piece on the board using drag-and-drop
+              functionality. You can delete or confirm placement.
+            </li>
+            <li>
+              Click "Template" button to populate the board with a predefined
+              puzzle template. Currently, one template is available, with more
+              to come.
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <img
+          src="https://d32bxxnq6qs937.cloudfront.net/sites/default/files/smartgames-product-banner_IQ-Puzzler-Pro_1.jpg"
+          class="rounded max-w-xs"
+        />
+      </div>
     </div>
     <!-- Puzzle Board -->
     <div
@@ -302,7 +322,7 @@ function handleDeleteClone() {
     <div
       class="w-full bg-gray-900 p-12 text-white flex flex-col gap-8 min-h-screen"
     >
-      <div class="text-xl">Puzzle Shapes</div>
+      <div class="text-2xl">Puzzle Shapes</div>
       <div class="flex flex-row items-start flex-wrap gap-6">
         <div
           v-for="block in blockList"
@@ -329,7 +349,7 @@ function handleDeleteClone() {
       <template
         v-if="selectedBlockId !== null && selectedBlockPositionList.length"
       >
-        <div class="text-xl">Positions</div>
+        <div class="text-2xl">Positions</div>
         <div class="flex flex-row items-start flex-wrap gap-6">
           <div
             v-for="(position, index) in selectedBlockPositionList"
