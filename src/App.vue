@@ -191,17 +191,13 @@ function handleDragEnd() {
 function handleAddClone() {
   if (!cloneData.value) return;
   const cloneElement = document.getElementById("clone");
-  const canva = document.getElementById("canva");
-  if (!cloneElement || !canva) return;
+  if (!cloneElement) return;
   const blockToAdd =
     selectedBlockPositionList.value[cloneData.value!.positionIndex];
   if (!blockToAdd) return;
 
-  const { left: canva_left, top: canva_top } = canva.getBoundingClientRect();
-  const { left, top } = cloneElement.getBoundingClientRect();
-
-  const x = (left - canva_left) / BLOCK_STEP;
-  const y = (top - canva_top) / BLOCK_STEP;
+  const x = cloneElement.offsetLeft / BLOCK_STEP;
+  const y = cloneElement.offsetTop / BLOCK_STEP;
   const entryIndex = y * length.value + x;
   if (entryIndex < 0 && entryIndex > base.value.length - 1) return;
 
