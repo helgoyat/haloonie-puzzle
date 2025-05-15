@@ -255,6 +255,8 @@ function handleDeleteClone() {
           </ul>
         </div>
         <div class="text-red-500">This application is still under development.</div>
+        <div>See the <a href="https://d32bxxnq6qs937.cloudfront.net/sites/default/files/SmartGames%2048%20FREE%20IQ%20PUZZLER%20PRO_1.pdf" class="text-blue-500 underline" target="_blank">Puzzle Templates</a> book (Starter, Junior and Expert levels are functional)</div>
+        <div>Select any template or find one online, this application solves it and displays multiple solutions if available - more than 1 found.</div>
       </div>
       <div>
         <img
