@@ -19,7 +19,7 @@ const viewSolutionIndex = ref<number>(0);
 const base = ref<number[]>(new Array(length.value * height.value).fill(0));
 
 const dragging = ref(false);
-const cursor = ref<{ x: number; y: number } | null>(null);
+const prevClient = ref<{ x: number; y: number } | null>(null);
 const cloneData = ref<{ blockId: number; positionIndex: number } | null>(null);
 
 const diff_up = ref(0);
@@ -111,7 +111,7 @@ function handlePositionSelect(event: Event, index: number): void {
   confirmBtn.addEventListener("click", handleAddClone);
   container.appendChild(confirmBtn);
 
-  window.addEventListener("pointerdown", handleDragStart);
+  container.addEventListener("pointerdown", handleDragStart);
   window.addEventListener("pointermove", handleDragging);
   window.addEventListener("pointerup", handleDragEnd);
 
@@ -125,63 +125,87 @@ function handlePositionSelect(event: Event, index: number): void {
 function handleDragStart(event: PointerEvent) {
   dragging.value = true;
   const { clientX, clientY } = event;
-  cursor.value = { x: clientX, y: clientY };
+  prevClient.value = { x: clientX, y: clientY };
 }
 
 function handleDragging(event: PointerEvent) {
-  if (!dragging.value || !cursor.value) return;
-  const canva = document.getElementById("canva");
   const cloneElement = document.getElementById("clone");
-  if (!cloneElement || !canva || !clonePosition.value) return;
-
-  const { left: canva_left, top: canva_top } = canva.getBoundingClientRect();
-  const { left, top } = cloneElement.getBoundingClientRect();
+  const canva = document.getElementById("canva");
+  if (
+    !cloneElement ||
+    !canva ||
+    !clonePosition.value ||
+    !dragging.value ||
+    !prevClient.value
+  )
+    return;
 
   const { clientX, clientY } = event;
+  const {
+    left: canva_left,
+    top: canva_top,
+    width: canva_width,
+    height: canva_height,
+  } = canva.getBoundingClientRect();
+
+  const withinBoard =
+    clientX >= canva_left &&
+    clientX <= canva_left + canva_width &&
+    clientY >= canva_top &&
+    clientY <= canva_top + canva_height;
+  if (!withinBoard) return;
 
   if (
-    clientX > cursor.value.x &&
-    left - canva_left <
+    clientX > prevClient.value.x &&
+    cloneElement.offsetLeft <
       BLOCK_STEP * length.value - BLOCK_STEP * clonePosition.value.x
   ) {
-    diff_right.value += Math.round(clientX - cursor.value.x);
+    diff_right.value += Math.round(clientX - prevClient.value.x);
+
     if (diff_right.value >= BLOCK_STEP) {
-      cloneElement.style.left = left - canva_left + BLOCK_STEP + "px";
+      // move right
+      cloneElement.style.left = cloneElement.offsetLeft + BLOCK_STEP + "px";
       diff_right.value = 0;
     }
   }
-  if (clientX < cursor.value.x && left - canva_left > 0) {
-    diff_left.value += Math.round(cursor.value.x - clientX);
+  if (clientX < prevClient.value.x && cloneElement.offsetLeft > 0) {
+    diff_left.value += Math.round(prevClient.value.x - clientX);
+
     if (diff_left.value >= BLOCK_STEP) {
-      cloneElement.style.left = left - canva_left - BLOCK_STEP + "px";
+      // move left
+      cloneElement.style.left = cloneElement.offsetLeft - BLOCK_STEP + "px";
       diff_left.value = 0;
     }
   }
   if (
-    clientY > cursor.value.y &&
-    top - canva_top <
+    clientY > prevClient.value.y &&
+    cloneElement.offsetTop <
       BLOCK_STEP * height.value - BLOCK_STEP * clonePosition.value.y
   ) {
-    diff_down.value += Math.round(clientY - cursor.value.y);
+    diff_down.value += Math.round(clientY - prevClient.value.y);
+
     if (diff_down.value >= BLOCK_STEP) {
-      cloneElement.style.top = top - canva_top + BLOCK_STEP + "px";
+      // move down
+      cloneElement.style.top = cloneElement.offsetTop + BLOCK_STEP + "px";
       diff_down.value = 0;
     }
   }
-  if (clientY < cursor.value.y && top - canva_top > 0) {
-    diff_up.value += Math.round(cursor.value.y - clientY);
+  if (clientY < prevClient.value.y && cloneElement.offsetTop > 0) {
+    diff_up.value += Math.round(prevClient.value.y - clientY);
+
     if (diff_up.value >= BLOCK_STEP) {
-      cloneElement.style.top = top - canva_top - BLOCK_STEP + "px";
+      // move up
+      cloneElement.style.top = cloneElement.offsetTop - BLOCK_STEP + "px";
       diff_up.value = 0;
     }
   }
 
-  cursor.value = { x: clientX, y: clientY };
+  prevClient.value = { x: clientX, y: clientY };
 }
 
 function handleDragEnd() {
   dragging.value = false;
-  cursor.value = null;
+  prevClient.value = null;
   diff_up.value = 0;
   diff_right.value = 0;
   diff_down.value = 0;
@@ -220,7 +244,6 @@ function handleDeleteClone() {
   if (!cloneElement) return;
   cloneElement.remove();
   cloneData.value = null;
-  window.removeEventListener("pointerdown", handleDragStart);
   window.removeEventListener("pointermove", handleDragging);
   window.removeEventListener("pointerup", handleDragEnd);
 }
@@ -254,9 +277,23 @@ function handleDeleteClone() {
             </li>
           </ul>
         </div>
-        <div class="text-red-500">This application is still under development.</div>
-        <div>See the <a href="https://d32bxxnq6qs937.cloudfront.net/sites/default/files/SmartGames%2048%20FREE%20IQ%20PUZZLER%20PRO_1.pdf" class="text-blue-500 underline" target="_blank">Puzzle Templates</a> book (Starter, Junior and Expert levels are functional)</div>
-        <div>Select any template or find one online, this application solves it and displays multiple solutions if available - more than 1 found.</div>
+        <div class="text-red-500">
+          This application is still under development.
+        </div>
+        <div>
+          See the
+          <a
+            href="https://d32bxxnq6qs937.cloudfront.net/sites/default/files/SmartGames%2048%20FREE%20IQ%20PUZZLER%20PRO_1.pdf"
+            class="text-blue-500 underline"
+            target="_blank"
+            >Puzzle Templates</a
+          >
+          book (Starter, Junior and Expert levels are functional)
+        </div>
+        <div>
+          Select any template or find one online, this application solves it and
+          displays multiple solutions if available - more than 1 found.
+        </div>
       </div>
       <div>
         <img
