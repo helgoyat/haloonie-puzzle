@@ -295,12 +295,6 @@ function handleDeleteClone() {
           displays multiple solutions if available - more than 1 found.
         </div>
       </div>
-      <div>
-        <img
-          src="https://d32bxxnq6qs937.cloudfront.net/sites/default/files/smartgames-product-banner_IQ-Puzzler-Pro_1.jpg"
-          class="rounded max-w-xs"
-        />
-      </div>
     </div>
     <!-- Puzzle Board -->
     <div
