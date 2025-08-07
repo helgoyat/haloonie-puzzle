@@ -259,6 +259,7 @@ function handleDeleteClone() {
           problem-solving approach. I realized these strategies could be
           algorithmically replicated, leading me to develop an application
           capable of solving easy-to-medium difficulty templates from the game.
+          Test.
         </div>
         <div class="text-2xl">📘 Instructions</div>
         <div>
